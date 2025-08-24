@@ -11,7 +11,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card';
 import { APP_NAME } from '@/constants/app';
-import { DatePicker } from '@/components/date-picker';
+import { DatePicker } from '@/components/ui/date-picker';
 import { XCircleIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useImageUpload } from '@/hooks/use-image-upload';

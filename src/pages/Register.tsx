@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircleIcon } from 'lucide-react';
 import { APP_NAME, APP_ROUTES } from '@/constants/app';
-import { DatePicker } from '@/components/date-picker';
+import { DatePicker } from '@/components/ui/date-picker';
 import UseAnimations from 'react-useanimations';
 import visibility from 'react-useanimations/lib/visibility2';
 import { registerSchema, validateSchema } from '@/utils/validations';
