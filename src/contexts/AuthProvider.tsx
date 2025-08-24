@@ -1,23 +1,32 @@
 import {
 	createContext,
-	useState,
 	useRef,
 	useEffect,
 	ReactNode,
 	useCallback,
+	useReducer,
+	useMemo,
 } from 'react';
-import axios from '@/services/api';
-
-interface AuthContextProps {
-	auth: { user: object | null; token: string | null };
-	setAuth: (auth: { user: object | null; token: string | null }) => void;
-	logout: () => void;
-}
+import {
+	AuthContextProps,
+	UpdatePassword,
+	UpdateProfile,
+	User,
+} from '@/types/auth';
+import { toast } from 'sonner';
+import { CheckCircle2Icon } from 'lucide-react';
+import { withAbortToast } from '@/utils/withAbortToast';
+import { tokenManager as token } from '@/lib/auth';
+import { useAuthService } from '@/hooks/useAuthService';
+import { authReducer } from './authReducer';
+import { PasswordChangePayload } from '@/types/api';
 
 const AuthContext = createContext<AuthContextProps>({
-	auth: { user: null, token: null },
-	setAuth: () => {},
-	logout: () => {},
+	state: { user: null },
+	dispatch: () => {},
+	updateProfile: async () => {},
+	updatePassword: async () => {},
+	logout: async () => {},
 });
 
 interface AuthProviderProps {
@@ -25,12 +34,8 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-	const [auth, setAuth] = useState<{ user: object | null; token: string | null }>(
-		{
-			user: null,
-			token: null,
-		},
-	);
+	const [state, dispatch] = useReducer(authReducer, { user: null });
+	const authService = useAuthService();
 	const isMounted = useRef(true);
 
 	useEffect(() => {
@@ -42,20 +47,76 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	const logout = useCallback(async () => {
 		try {
-			await axios.delete('/auth/logout');
+			await authService.logout();
 			if (isMounted.current) {
-				setAuth({ user: null, token: null });
+				dispatch({ type: 'LOGOUT' });
+				token.clearToken();
 			}
 		} catch (err) {
 			console.error('Logout failed', err);
+			toast.error('Logout failed', {
+				description: 'Something went wrong while logging out.',
+			});
 		}
-	}, []);
+	}, [authService]);
 
-	return (
-		<AuthContext.Provider value={{ auth, setAuth, logout }}>
-			{children}
-		</AuthContext.Provider>
+	const updateProfile: UpdateProfile = useCallback(
+		async (data: FormData) => {
+			await withAbortToast({
+				label: 'Updating Profile',
+				description: 'Your profile is being updated.',
+				duration: 3000,
+				onConfirm: async (controller) => {
+					const updatedData = await authService.updateProfile(data);
+
+					if (!controller.signal.aborted) {
+						const updatedUser = { ...state.user, ...updatedData } as User;
+						toast.success('Profile Updated', {
+							description: 'Your profile has been updated successfully.',
+							icon: <CheckCircle2Icon className="size-5 text-green-500" />,
+						});
+						if (isMounted.current)
+							dispatch({ type: 'SET_USER', payload: updatedUser });
+					}
+				},
+			});
+		},
+		[authService, state.user]
 	);
+
+	const updatePassword: UpdatePassword = useCallback(
+		async (data: PasswordChangePayload) => {
+			await withAbortToast({
+				label: 'Updating Password',
+				description: 'Your password is being updated.',
+				onConfirm: async (controller) => {
+					await authService.updatePassword(data);
+
+					if (!controller.signal.aborted) {
+						toast.success('Password Updated', {
+							description: 'Your password has been updated successfully.',
+							icon: <CheckCircle2Icon className="size-5 text-green-500" />,
+						});
+						if (isMounted.current) await logout();
+					}
+				},
+			});
+		},
+		[authService, logout]
+	);
+
+	const value = useMemo(
+		() => ({
+			state,
+			dispatch,
+			updateProfile,
+			updatePassword,
+			logout,
+		}),
+		[state, updateProfile, updatePassword, logout]
+	);
+
+	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export default AuthContext;

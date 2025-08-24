@@ -4,7 +4,7 @@ import Footer from '../common/Footer';
 
 const Layout = () => {
 	return (
-		<div>
+		<div style={{}}>
 			<Header />
 			<main>
 				<Outlet />

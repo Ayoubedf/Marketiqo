@@ -50,6 +50,35 @@
 	--sidebar-ring: oklch(0.707 0.022 261.325);
 }
 
+/* SafeList */
+.text-yellow-400 {
+	@apply text-yellow-400;
+}
+.text-gray-400\/50 {
+	@apply text-gray-400/50;
+}
+.bg-blue-500 {
+	@apply bg-blue-500;
+}
+.bg-red-500 {
+	@apply bg-red-500;
+}
+.bg-purple-500 {
+	@apply bg-purple-500;
+}
+.bg-green-500 {
+	@apply bg-green-500;
+}
+.bg-yellow-500 {
+	@apply bg-yellow-500;
+}
+.bg-orange-500 {
+	@apply bg-orange-500;
+}
+.bg-gray-500 {
+	@apply bg-gray-500;
+}
+
 @layer components {
 	a {
 		font-weight: 500;
@@ -74,14 +103,14 @@ body {
 	min-height: 100vh;
 }
 
-h1 {
+/* h1 {
 	font-size: 3.2em;
 	line-height: 1.1;
-}
+} */
 
 button {
 	/* border-radius: 8px; */
-	border: 1px solid transparent;
+	/* border: 1px solid transparent; */
 	/* padding: 0.6em 1.2em; */
 	/* font-size: 1em; */
 	font-weight: 500;
@@ -99,7 +128,7 @@ button:focus-visible {
 } */
 
 button:disabled {
-	background: rgb(59, 130, 246);
+	/* background: rgb(59, 130, 246); */
 	opacity: 0.5;
 	cursor: not-allowed;
 }
