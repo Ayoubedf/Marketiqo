@@ -47,9 +47,9 @@ const Settings = () => {
 	const handlePasswordUpdate = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const data: PasswordChangePayload = {
-			currentPassword: currentPasswordRef.current?.value.trim() as string,
-			newPassword: newPasswordRef.current?.value.trim() as string,
-			confirmPassword: confirmPasswordRef.current?.value.trim() as string,
+			current_password: currentPasswordRef.current?.value.trim() as string,
+			password: newPasswordRef.current?.value.trim() as string,
+			password_confirm: confirmPasswordRef.current?.value.trim() as string,
 		};
 
 		if (!validate()) {

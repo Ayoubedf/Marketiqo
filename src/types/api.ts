@@ -18,9 +18,9 @@ export interface RegisterRequestPayload {
 }
 
 export interface PasswordChangePayload {
-	currentPassword: string;
-	newPassword: string;
-	confirmPassword: string;
+	current_password: string;
+	password: string;
+	password_confirm: string;
 }
 
 export interface ResetPasswordPayload {

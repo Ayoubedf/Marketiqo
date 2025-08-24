@@ -43,8 +43,7 @@ const Collections = () => {
 		return () => {
 			controller.abort();
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [query]);
+	}, [productService, query]);
 
 	const Error = () => (
 		<div className="col-span-full mx-auto w-full px-4 py-2">

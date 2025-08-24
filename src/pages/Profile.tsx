@@ -38,7 +38,7 @@ const Profile = () => {
 		handleFileChange,
 		fileName,
 	} = useImageUpload();
-	const [didMount, setDidMount] = useState<boolean>(false);
+	const isMounted = useRef<boolean>(false);
 	const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
 		{}
 	);
@@ -51,6 +51,7 @@ const Profile = () => {
 			email: emailRef.current?.value?.trim() || '',
 			birthDate: date,
 		};
+		if (!isMounted.current) isMounted.current = true;
 
 		const errors: ValidationErrors = validateSchema(
 			formInputValues,
@@ -66,9 +67,7 @@ const Profile = () => {
 	}, []);
 
 	useEffect(() => {
-		if (didMount) validate();
-		else setDidMount(true);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		if (isMounted.current) validate();
 	}, [date, validate]);
 
 	const handleSubmit = async (e: React.FormEvent) => {

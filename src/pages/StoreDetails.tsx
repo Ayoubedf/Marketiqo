@@ -52,7 +52,7 @@ const StoreDetails = () => {
 	const productDescRef = useRef<HTMLTextAreaElement>(null);
 	const productPriceRef = useRef<HTMLInputElement>(null);
 	const [categories, setCategories] = useState<string[]>([]);
-	const [didMount, setDidMount] = useState<boolean>(false);
+	const isStoreDetailsMounted = useRef(false);
 	const [storeValidationErrors, setStoreValidationErrors] =
 		useState<StoreValidationErrors>({});
 	const [productValidationErrors, setProductValidationErrors] =
@@ -62,6 +62,7 @@ const StoreDetails = () => {
 		const formInputValues = {
 			name: storeNameRef.current?.value?.trim() || '',
 		};
+		if (!isStoreDetailsMounted.current) isStoreDetailsMounted.current = true;
 
 		const errors: StoreValidationErrors = validateSchema(
 			formInputValues,
@@ -90,12 +91,11 @@ const StoreDetails = () => {
 		return Object.keys(errors).length === 0;
 	}, []);
 
-	const resetForm = () => {
-		if (storeNameRef.current) storeNameRef.current.value = '';
-		if (storeDescRef.current) storeDescRef.current.value = '';
-		if (categories.length) setCategories([]);
-		logo.handleRemove();
-		setStoreValidationErrors({});
+	const resetProductForm = () => {
+		if (productNameRef.current) productNameRef.current.value = '';
+		if (productDescRef.current) productDescRef.current.value = '';
+		if (productPriceRef.current) productPriceRef.current.value = '';
+		preview.handleRemove();
 		setProductValidationErrors({});
 	};
 
@@ -124,16 +124,13 @@ const StoreDetails = () => {
 		return () => {
 			controller.abort();
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [id]);
+	}, [id, storeService]);
 
 	useEffect(() => {
-		if (didMount) validateStoreDetails();
-		else setDidMount(true);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [categories.length]);
+		if (isStoreDetailsMounted.current) validateStoreDetails();
+	}, [categories.length, validateStoreDetails]);
 
-	const handleChange = (category: Category) => {
+	const handleChangeCategory = (category: Category) => {
 		setCategories((prev) =>
 			prev.includes(category)
 				? prev.filter((cat) => cat !== category)
@@ -162,19 +159,18 @@ const StoreDetails = () => {
 		}
 
 		try {
-			toast.success('Store Created', {
-				description: 'Your store has been created successfully.',
+			toast.success('Store Updated.', {
+				description: 'Your store has been updated successfully.',
 				icon: <CheckCircle2Icon className="size-5 text-green-500" />,
 			});
-			resetForm();
 		} catch (error) {
-			console.error('Errpr', error);
+			console.error('Error', error);
 
-			toast.error('failed to Create Store', {
+			toast.error('failed to Update Store', {
 				description:
 					error instanceof AxiosError
 						? error.response?.data.error
-						: 'Something went wrong while creating the store.',
+						: 'Something went wrong while updating the store.',
 				icon: <XCircleIcon className="size-5 text-red-500" />,
 			});
 		}
@@ -182,17 +178,15 @@ const StoreDetails = () => {
 
 	const handleAddProduct = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setStoreValidationErrors({});
-		const file = logo.fileInputRef.current?.files?.[0];
+		setProductValidationErrors({});
+		const file = preview.fileInputRef.current?.files?.[0];
 		const formData = new FormData();
-		formData.append('name', storeNameRef.current?.value as string);
-		formData.append('description', storeDescRef.current?.value as string);
-		if (file) formData.append('logo', file);
-		categories.forEach((category) => {
-			formData.append('categories', category);
-		});
+		formData.append('name', productNameRef.current?.value as string);
+		formData.append('description', productDescRef.current?.value as string);
+		if (file) formData.append('preview', file);
+		formData.append('price', productPriceRef.current?.value as string);
 
-		if (!validateStoreDetails()) {
+		if (!validateProductDetails()) {
 			toast.error('Validation Error', {
 				description: 'Please fix the errors in the form.',
 				icon: <XCircleIcon className="size-5 text-red-500" />,
@@ -201,19 +195,19 @@ const StoreDetails = () => {
 		}
 
 		try {
-			toast.success('Store Created', {
-				description: 'Your store has been created successfully.',
+			toast.success('Product Added', {
+				description: 'Your product has been added successfully.',
 				icon: <CheckCircle2Icon className="size-5 text-green-500" />,
 			});
-			resetForm();
+			resetProductForm();
 		} catch (error) {
-			console.error('Errpr', error);
+			console.error('Error', error);
 
-			toast.error('failed to Create Store', {
+			toast.error('failed to Add Product', {
 				description:
 					error instanceof AxiosError
 						? error.response?.data.error
-						: 'Something went wrong while creating the store.',
+						: 'Something went wrong while adding the product.',
 				icon: <XCircleIcon className="size-5 text-red-500" />,
 			});
 		}
@@ -258,17 +252,17 @@ const StoreDetails = () => {
 				</div>
 				<div className="flex gap-3">
 					<Dialog>
-						<form
-							onChange={validateProductDetails}
-							method="POST"
-							onSubmit={handleAddProduct}
-						>
-							<DialogTrigger asChild>
-								<Button variant="outline">
-									<PlusCircleIcon /> Add Product
-								</Button>
-							</DialogTrigger>
-							<DialogContent className="sm:max-w-xl">
+						<DialogTrigger asChild>
+							<Button variant="outline">
+								<PlusCircleIcon /> Add Product
+							</Button>
+						</DialogTrigger>
+						<DialogContent className="sm:max-w-xl">
+							<form
+								onChange={validateProductDetails}
+								method="POST"
+								onSubmit={handleAddProduct}
+							>
 								<DialogHeader>
 									<DialogTitle>Add Product</DialogTitle>
 									<DialogDescription>
@@ -341,22 +335,22 @@ const StoreDetails = () => {
 									</DialogClose>
 									<Button type="submit">Save</Button>
 								</DialogFooter>
-							</DialogContent>
-						</form>
+							</form>
+						</DialogContent>
 					</Dialog>
 					<Dialog>
-						<form
-							onChange={validateStoreDetails}
-							method="POST"
-							onSubmit={handleManageStore}
-						>
-							<DialogTrigger asChild>
-								<Button variant="default" className="flex items-center gap-2">
-									<SettingsIcon className="h-4 w-4" />
-									Manage Store
-								</Button>
-							</DialogTrigger>
-							<DialogContent className="sm:max-w-xl">
+						<DialogTrigger asChild>
+							<Button variant="default" className="flex items-center gap-2">
+								<SettingsIcon className="h-4 w-4" />
+								Manage Store
+							</Button>
+						</DialogTrigger>
+						<DialogContent className="sm:max-w-xl">
+							<form
+								onChange={validateStoreDetails}
+								method="POST"
+								onSubmit={handleManageStore}
+							>
 								<DialogHeader>
 									<DialogTitle>Manage Store</DialogTitle>
 									<DialogDescription>
@@ -435,7 +429,7 @@ const StoreDetails = () => {
 																id={checkboxId}
 																type="checkbox"
 																checked={isChecked}
-																onChange={() => handleChange(cat)}
+																onChange={() => handleChangeCategory(cat)}
 																className="peer h-5 w-5 appearance-none rounded border border-gray-200 shadow transition-all outline-none checked:border-blue-600 checked:bg-blue-600 hover:shadow-md focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
 															/>
 															<span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform text-white opacity-0 peer-checked:opacity-100">
@@ -474,8 +468,8 @@ const StoreDetails = () => {
 									</DialogClose>
 									<Button type="submit">Save</Button>
 								</DialogFooter>
-							</DialogContent>
-						</form>
+							</form>
+						</DialogContent>
 					</Dialog>
 				</div>
 			</div>

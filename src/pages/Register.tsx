@@ -34,7 +34,7 @@ const Register = () => {
 	const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
 		{}
 	);
-	const [didMount, setDidMount] = useState<boolean>(false);
+	const isMounted = useRef<boolean>(false);
 	const [date, setDate] = useState<Date | undefined>();
 	const [error, setError] = useState<ErrorResponse>({});
 	const [passwordVisibility, setPasswordVisibility] = useState(false);
@@ -51,6 +51,8 @@ const Register = () => {
 			birthDate: date,
 			conditions: conditionsRef.current?.checked as boolean,
 		};
+		if (!isMounted.current) isMounted.current = true;
+
 		const errors: ValidationErrors = validateSchema(
 			formInputValues,
 			registerSchema
@@ -61,10 +63,8 @@ const Register = () => {
 	}, [date]);
 
 	useEffect(() => {
-		if (didMount) validate();
-		else setDidMount(true);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [date]);
+		if (isMounted.current) validate();
+	}, [date, validate]);
 
 	const resetForm = () => {
 		if (emailRef.current) emailRef.current.value = '';

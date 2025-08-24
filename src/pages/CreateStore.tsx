@@ -26,7 +26,7 @@ export default function CreateStore() {
 	const nameRef = useRef<HTMLInputElement>(null);
 	const descRef = useRef<HTMLTextAreaElement>(null);
 	const [categories, setCategories] = useState<string[]>([]);
-	const [didMount, setDidMount] = useState<boolean>(false);
+	const isMounted = useRef<boolean>(false);
 	const [validationErrors, setValidationErrors] =
 		useState<StoreValidationErrors>({});
 	const storeService = useStoreService();
@@ -36,6 +36,7 @@ export default function CreateStore() {
 		const formInputValues = {
 			name: nameRef.current?.value?.trim() || '',
 		};
+		if (!isMounted.current) isMounted.current = true;
 
 		const errors: StoreValidationErrors = validateSchema(
 			formInputValues,
@@ -87,7 +88,7 @@ export default function CreateStore() {
 
 			navigate(APP_ROUTES.STORES);
 		} catch (error) {
-			console.error('Errpr', error);
+			console.error('Error', error);
 
 			toast.error('failed to Create Store', {
 				description:
@@ -108,9 +109,7 @@ export default function CreateStore() {
 	};
 
 	useEffect(() => {
-		if (didMount) validate();
-		else setDidMount(true);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		if (isMounted.current) validate();
 	}, [categories, validate]);
 
 	return (

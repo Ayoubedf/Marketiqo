@@ -10,6 +10,7 @@ import {
 } from '@/types/api';
 import useAuth from './useAuth';
 import { LoginFormValues } from '@/types/form';
+import { useMemo } from 'react';
 
 // type AuthService = {
 // 	[K in keyof typeof rawService]: unknown;
@@ -20,20 +21,23 @@ export function useAuthService() {
 	const { state, dispatch } = useAuth();
 	const userId = state.user?._id as string;
 
-	return {
-		register: (data: RegisterRequestPayload) =>
-			rawService.register(axios, data),
-		login: (data: LoginFormValues) => rawService.login(axios, dispatch, data),
-		logout: () => rawService.logout(axiosPrivate),
-		updateProfile: (data: FormData) =>
-			rawService.updateProfile(axiosPrivate, userId, data),
-		updatePassword: (data: PasswordChangePayload) =>
-			rawService.updatePassword(axiosPrivate, data),
-		resetPassword: (data: ResetPasswordPayload) =>
-			rawService.resetPassword(axios, data),
-		verifyOTP: (data: VerifyOtpPayload) => rawService.verifyOTP(axios, data),
-		resetConfPassword: (data: ResetConfPasswordPayload) =>
-			rawService.resetConfPassword(axiosPrivate, data),
-		refresh: () => rawService.refresh(axios, dispatch),
-	};
+	return useMemo(
+		() => ({
+			register: (data: RegisterRequestPayload) =>
+				rawService.register(axios, data),
+			login: (data: LoginFormValues) => rawService.login(axios, dispatch, data),
+			logout: () => rawService.logout(axiosPrivate),
+			updateProfile: (data: FormData) =>
+				rawService.updateProfile(axiosPrivate, userId, data),
+			updatePassword: (data: PasswordChangePayload) =>
+				rawService.updatePassword(axiosPrivate, data),
+			resetPassword: (data: ResetPasswordPayload) =>
+				rawService.resetPassword(axios, data),
+			verifyOTP: (data: VerifyOtpPayload) => rawService.verifyOTP(axios, data),
+			resetConfPassword: (data: ResetConfPasswordPayload) =>
+				rawService.resetConfPassword(axiosPrivate, data),
+			refresh: () => rawService.refresh(axios, dispatch),
+		}),
+		[axiosPrivate, dispatch, userId]
+	);
 }

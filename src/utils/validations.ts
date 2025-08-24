@@ -93,9 +93,6 @@ export const createStoreSchema: ValidationSchema<
 		required: true,
 		minLength: 2,
 	},
-	categories: {
-		required: true,
-	},
 };
 
 export const registerSchema: ValidationSchema<Partial<RegisterFormValues>> = {
