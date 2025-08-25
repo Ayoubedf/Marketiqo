@@ -12,7 +12,7 @@ export const API_ENDPOINTS = {
 	PASS_RESET_CONFIRM: '/auth/password/reset/confirm',
 	PASS_CHANGE: '/users/password/change',
 	VERIFY_OTP: '/auth/verify-otp',
-	PROFILE: '/users/profile/',
+	PROFILE: '/users/profile',
 	REFRESH: '/refresh',
 	SETTINGS: '/settings',
 };

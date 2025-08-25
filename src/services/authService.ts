@@ -42,17 +42,13 @@ export async function logout(axios: Axios) {
 	tokenManager.clearToken();
 }
 
-export async function updateProfile(
-	axios: Axios,
-	userId: string,
-	data: FormData
-) {
+export async function updateProfile(axios: Axios, data: FormData) {
 	const updatedData: Partial<UserProfile> = Object.fromEntries(data.entries());
 	if (updatedData.avatar instanceof File) {
 		updatedData.avatar = await getBase64(updatedData.avatar);
 	}
 
-	await axios.put(`${API_ENDPOINTS.PROFILE}${userId}`, data, {
+	await axios.put(API_ENDPOINTS.PROFILE, data, {
 		headers: { Authorization: `Bearer ${tokenManager.getAccessToken()}` },
 	});
 

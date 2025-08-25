@@ -18,8 +18,7 @@ import { useMemo } from 'react';
 
 export function useAuthService() {
 	const axiosPrivate = useAxiosPrivate();
-	const { state, dispatch } = useAuth();
-	const userId = state.user?._id as string;
+	const { dispatch } = useAuth();
 
 	return useMemo(
 		() => ({
@@ -28,7 +27,7 @@ export function useAuthService() {
 			login: (data: LoginFormValues) => rawService.login(axios, dispatch, data),
 			logout: () => rawService.logout(axiosPrivate),
 			updateProfile: (data: FormData) =>
-				rawService.updateProfile(axiosPrivate, userId, data),
+				rawService.updateProfile(axiosPrivate, data),
 			updatePassword: (data: PasswordChangePayload) =>
 				rawService.updatePassword(axiosPrivate, data),
 			resetPassword: (data: ResetPasswordPayload) =>
@@ -38,6 +37,6 @@ export function useAuthService() {
 				rawService.resetConfPassword(axiosPrivate, data),
 			refresh: () => rawService.refresh(axios, dispatch),
 		}),
-		[axiosPrivate, dispatch, userId]
+		[axiosPrivate, dispatch]
 	);
 }
