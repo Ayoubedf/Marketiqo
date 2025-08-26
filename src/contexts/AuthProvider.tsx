@@ -17,9 +17,11 @@ import { toast } from 'sonner';
 import { CheckCircle2Icon } from 'lucide-react';
 import { withAbortToast } from '@/utils/withAbortToast';
 import { tokenManager as token } from '@/lib/auth';
-import { useAuthService } from '@/hooks/useAuthService';
+// import { useAuthService } from '@/hooks/useAuthService';
+import * as rawService from '@/services/authService';
 import { authReducer } from './authReducer';
 import { PasswordChangePayload } from '@/types/api';
+import useAxiosPrivate from '@/hooks/useAxiosPrivate';
 
 const AuthContext = createContext<AuthContextProps>({
 	state: { user: null },
@@ -35,7 +37,8 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
 	const [state, dispatch] = useReducer(authReducer, { user: null });
-	const authService = useAuthService();
+	// const authService = useAuthService();
+	const axiosPrivate = useAxiosPrivate();
 	const isMounted = useRef(true);
 
 	useEffect(() => {
@@ -47,7 +50,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	const logout = useCallback(async () => {
 		try {
-			await authService.logout();
+			await rawService.logout(axiosPrivate);
 			if (isMounted.current) {
 				dispatch({ type: 'LOGOUT' });
 				token.clearToken();
@@ -58,7 +61,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				description: 'Something went wrong while logging out.',
 			});
 		}
-	}, [authService]);
+	}, [axiosPrivate]);
 
 	const updateProfile: UpdateProfile = useCallback(
 		async (data: FormData) => {
@@ -67,7 +70,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				description: 'Your profile is being updated.',
 				duration: 3000,
 				onConfirm: async (controller) => {
-					const updatedData = await authService.updateProfile(data);
+					const updatedData = await rawService.updateProfile(
+						axiosPrivate,
+						data
+					);
 
 					if (!controller.signal.aborted) {
 						const updatedUser = { ...state.user, ...updatedData } as User;
@@ -81,7 +87,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				},
 			});
 		},
-		[authService, state.user]
+		[axiosPrivate, state.user]
 	);
 
 	const updatePassword: UpdatePassword = useCallback(
@@ -90,7 +96,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				label: 'Updating Password',
 				description: 'Your password is being updated.',
 				onConfirm: async (controller) => {
-					await authService.updatePassword(data);
+					await rawService.updatePassword(axiosPrivate, data);
 
 					if (!controller.signal.aborted) {
 						toast.success('Password Updated', {
@@ -102,7 +108,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				},
 			});
 		},
-		[authService, logout]
+		[axiosPrivate, logout]
 	);
 
 	const value = useMemo(

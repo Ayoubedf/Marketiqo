@@ -257,7 +257,7 @@ const StoreDetails = () => {
 								<PlusCircleIcon /> Add Product
 							</Button>
 						</DialogTrigger>
-						<DialogContent className="sm:max-w-xl">
+						<DialogContent className="max-h-full overflow-y-auto sm:max-w-xl">
 							<form
 								onChange={validateProductDetails}
 								method="POST"
@@ -345,7 +345,7 @@ const StoreDetails = () => {
 								Manage Store
 							</Button>
 						</DialogTrigger>
-						<DialogContent className="sm:max-w-xl">
+						<DialogContent className="max-h-full overflow-y-auto sm:max-w-xl">
 							<form
 								onChange={validateStoreDetails}
 								method="POST"

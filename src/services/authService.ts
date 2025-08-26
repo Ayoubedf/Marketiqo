@@ -2,6 +2,7 @@ import { API_ENDPOINTS } from '@/constants/app';
 import { getBase64 } from '@/utils/getBase64';
 import { AuthAction, AuthResponse, UserProfile } from '@/types/auth';
 import { tokenManager, userResetManager as userReset } from '@/lib/auth';
+import axios from '@/services/api';
 import { Axios } from 'axios';
 import { Dispatch } from 'react';
 import { LoginFormValues } from '@/types/form';
@@ -14,12 +15,11 @@ import {
 	VerifyOtpPayload,
 } from '@/types/api';
 
-export async function register(axios: Axios, data: RegisterRequestPayload) {
+export async function register(data: RegisterRequestPayload) {
 	await axios.post(API_ENDPOINTS.REGISTER, data);
 }
 
 export async function login(
-	axios: Axios,
 	dispatch: Dispatch<AuthAction>,
 	data: LoginFormValues
 ) {
@@ -44,6 +44,7 @@ export async function logout(axios: Axios) {
 
 export async function updateProfile(axios: Axios, data: FormData) {
 	const updatedData: Partial<UserProfile> = Object.fromEntries(data.entries());
+
 	if (updatedData.avatar instanceof File) {
 		updatedData.avatar = await getBase64(updatedData.avatar);
 	}
@@ -64,7 +65,7 @@ export async function updatePassword(
 	});
 }
 
-export async function resetPassword(axios: Axios, data: ResetPasswordPayload) {
+export async function resetPassword(data: ResetPasswordPayload) {
 	await axios.post(
 		API_ENDPOINTS.PASS_RESET_REQUEST,
 		{
@@ -79,7 +80,7 @@ export async function resetPassword(axios: Axios, data: ResetPasswordPayload) {
 	userReset.set({ email: data.email });
 }
 
-export async function verifyOTP(axios: Axios, data: VerifyOtpPayload) {
+export async function verifyOTP(data: VerifyOtpPayload) {
 	const res = await axios.post(API_ENDPOINTS.VERIFY_OTP, data, {
 		headers: {
 			'Content-Type': 'application/json',
@@ -98,10 +99,7 @@ export async function resetConfPassword(
 	});
 }
 
-export async function refresh(
-	axios: Axios,
-	dispatch: Dispatch<AuthAction>
-): Promise<Token> {
+export async function refresh(dispatch: Dispatch<AuthAction>): Promise<Token> {
 	try {
 		const response = await axios.get(API_ENDPOINTS.REFRESH, {
 			headers: {

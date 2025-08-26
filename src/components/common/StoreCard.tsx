@@ -6,7 +6,7 @@ const StoreCard = ({ store }: { store: Store }) => {
 	return (
 		<div
 			key={store._id}
-			className="bg-base-100 relative flex w-96 flex-col overflow-clip rounded-lg shadow-sm outline-offset-2 transition-all"
+			className="bg-base-100 relative flex flex-col overflow-clip rounded-lg shadow-sm outline-offset-2 transition-all"
 		>
 			<figure className="relative h-32 w-full bg-gray-300">
 				<Avatar className="absolute bottom-0 left-5 flex size-15 translate-y-1/5 items-center justify-center overflow-hidden rounded-2xl ring-2 ring-gray-100">
