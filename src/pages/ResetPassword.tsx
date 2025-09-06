@@ -10,18 +10,18 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { APP_NAME, APP_ROUTES } from '@/constants/app';
-import { ErrorResponse } from '@/types/auth';
 import { userResetManager as userReset } from '@/lib/auth';
-import { AxiosError } from 'axios';
-import { useAuthService } from '@/hooks/useAuthService';
-import { ResetConfPasswordPayload } from '@/types/api';
+import { ApiError, isApiError, ResetConfPasswordPayload } from '@/types';
 import UseAnimations from 'react-useanimations';
 import visibility from 'react-useanimations/lib/visibility2';
 import { resetPasswordSchema, validateSchema } from '@/utils/validations';
+import { useAuthActions } from '@/contexts/authContexts';
+import { renderFieldError } from '@/utils/renderFieldError';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 
-interface FormValidationErrors {
+interface ValidationErrors {
 	password?: string;
 	password_confirm?: string;
 }
@@ -32,32 +32,30 @@ export default function ResetPassword({
 }: {
 	className?: string;
 }) {
-	const authService = useAuthService();
+	const authAction = useAuthActions();
 	const email = userReset.get()?.email;
 	const newPasswordRef = useRef<HTMLInputElement>(null);
 	const confirmPasswordRef = useRef<HTMLInputElement>(null);
 	const [passwordVisibility, setPasswordVisibility] = useState(false);
-	const [validationErrors, setValidationErrors] =
-		useState<FormValidationErrors | null>(null);
-	const [, setError] = useState<ErrorResponse | null>(null);
+	const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+		{}
+	);
+	const [, setError] = useState<ApiError | null>(null);
 	const navigate = useNavigate();
 	const resetToken = userReset.get()?.resetToken || '';
 
-	if (!email) return <Navigate to={APP_ROUTES.HOME} />;
-
-	const validate = () => {
+	const validate = useCallback((): boolean => {
 		const formInputValues = {
 			password: newPasswordRef.current?.value.trim(),
 			password_confirm: confirmPasswordRef.current?.value.trim(),
 		};
-		const errors: FormValidationErrors = validateSchema(
+		const errors: ValidationErrors = validateSchema(
 			formInputValues,
 			resetPasswordSchema
 		);
-
 		setValidationErrors(errors);
 		return Object.keys(errors).length === 0;
-	};
+	}, []);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -67,26 +65,19 @@ export default function ResetPassword({
 			resetToken,
 		};
 		if (!validate()) return;
-		try {
-			await authService.resetConfPassword(data);
+		const response = await authAction.resetConfPassword(data);
+		if (isApiError(response)) {
+			setError(response);
+		} else {
 			navigate(APP_ROUTES.LOGIN, { replace: true });
-		} catch (err) {
-			if (err instanceof AxiosError) {
-				if (!err.response) {
-					setError({ status: 0, message: err.message });
-				} else {
-					setError({
-						status: err.response.status,
-						message:
-							(err.response.data as { message?: string })?.message ||
-							'Unexpected error',
-					});
-				}
-			} else setError({ status: 0, message: 'Unknown error occurred' });
 		}
 	};
 
-	document.title = `Change Password | ${APP_NAME}`;
+	const title = `Change Password | ${APP_NAME}`;
+	useDocumentTitle(title);
+
+	if (!email) return <Navigate to={APP_ROUTES.HOME} />;
+
 	return (
 		<>
 			<div className="col-span-full flex h-full w-full items-center justify-center py-38">
@@ -122,7 +113,7 @@ export default function ResetPassword({
 													placeholder="secret1234@"
 													autoComplete="new-password"
 													aria-describedby={
-														validationErrors?.password
+														validationErrors.password
 															? 'new-password-error'
 															: ''
 													}
@@ -138,7 +129,6 @@ export default function ResetPassword({
 													className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center justify-around rounded-md p-1 transition-colors hover:bg-gray-200/50"
 												>
 													<UseAnimations
-														className="ua-icon"
 														animation={visibility}
 														onClick={() =>
 															setPasswordVisibility(!passwordVisibility)
@@ -146,15 +136,7 @@ export default function ResetPassword({
 													/>
 												</button>
 											</div>
-											{validationErrors?.password && (
-												<p
-													id="new-password-error"
-													aria-live="assertive"
-													className="mt-1 text-xs text-red-500"
-												>
-													{validationErrors?.password}
-												</p>
-											)}
+											{renderFieldError(validationErrors.password)}
 										</div>
 										<div className="grid gap-2">
 											<Label htmlFor="confirm-password">Confirm Password</Label>
@@ -165,21 +147,13 @@ export default function ResetPassword({
 												placeholder="secret1234@"
 												autoComplete="confirm-password"
 												aria-describedby={
-													validationErrors?.password_confirm
+													validationErrors.password_confirm
 														? 'confirm-password-error'
 														: ''
 												}
 												required
 											/>
-											{validationErrors?.password_confirm && (
-												<p
-													id="new-password-error"
-													aria-live="assertive"
-													className="mt-1 text-xs text-red-500"
-												>
-													{validationErrors?.password_confirm}
-												</p>
-											)}
+											{renderFieldError(validationErrors.password_confirm)}
 										</div>
 										<Button type="submit" className="w-full">
 											Change Password

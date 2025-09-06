@@ -6,9 +6,9 @@ import {
 } from 'axios';
 import axios from '@/services/api';
 import { useEffect, useRef } from 'react';
-import useRefreshToken from './useRefreshToken';
+import useRefreshToken from './use-refresh-token';
 import { tokenManager } from '@/lib/auth';
-import { Token } from '@/types/api';
+import { Token } from '@/types';
 
 interface FailedRequest {
 	resolve: (token: Token) => void;
@@ -18,10 +18,8 @@ interface FailedRequest {
 const useAxiosPrivate = (): AxiosInstance => {
 	const refresh = useRefreshToken();
 	const tokenRef = useRef<string | null>(tokenManager.getAccessToken());
-	const refreshRef = useRef(refresh);
 
 	tokenRef.current = tokenManager.getAccessToken();
-	refreshRef.current = refresh;
 
 	useEffect(() => {
 		let isRefreshing = false;
@@ -67,7 +65,7 @@ const useAxiosPrivate = (): AxiosInstance => {
 					prevRequest.sent = true;
 					isRefreshing = true;
 					try {
-						const newToken = await refreshRef.current();
+						const newToken = await refresh();
 						tokenRef.current = newToken;
 						prevRequest.headers!['Authorization'] = `Bearer ${newToken}`;
 						processQueue(null, newToken);

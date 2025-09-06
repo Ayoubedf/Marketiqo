@@ -12,4 +12,8 @@ export default defineConfig({
 			'@shadcn': path.resolve(__dirname, './src/components/ui'),
 		},
 	},
+	// server: {
+	// 	open: true,
+	// 	port: 8080,
+	// },
 });

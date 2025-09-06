@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import useAuth from '@/hooks/useAuth';
-import { toast } from 'sonner';
+import { useAuthActions, useAuthState } from '@/contexts/authContexts';
+import { notify } from '@/lib/notify';
 import {
 	Card,
 	CardContent,
@@ -12,10 +12,12 @@ import {
 } from '@/components/ui/card';
 import { APP_NAME } from '@/constants/app';
 import { DatePicker } from '@/components/ui/date-picker';
-import { XCircleIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useImageUpload } from '@/hooks/use-image-upload';
 import { editProfileSchema, validateSchema } from '@/utils/validations';
+import { motion } from 'framer-motion';
+import { renderFieldError } from '@/utils/renderFieldError';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 
 interface ValidationErrors {
 	name?: string;
@@ -24,7 +26,8 @@ interface ValidationErrors {
 }
 
 const Profile = () => {
-	const { state, updateProfile } = useAuth();
+	const { state } = useAuthState();
+	const { updateProfile } = useAuthActions();
 	const nameRef = useRef<HTMLInputElement>(null);
 	const emailRef = useRef<HTMLInputElement>(null);
 	const DefaultDate = state.user?.birthDate
@@ -37,37 +40,34 @@ const Profile = () => {
 		handleThumbnailClick,
 		handleFileChange,
 		fileName,
+		handleRemove,
 	} = useImageUpload();
-	const isMounted = useRef<boolean>(false);
 	const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
 		{}
 	);
 	const startDate = new Date(new Date().getFullYear() - 50, 0);
 	const endDate = new Date();
+	const MAX_FILE_SIZE_MB = 5;
 
 	const validate = useCallback((): boolean => {
 		const formInputValues = {
-			name: nameRef.current?.value?.trim() || '',
-			email: emailRef.current?.value?.trim() || '',
+			name: nameRef.current?.value.trim() || '',
+			email: emailRef.current?.value.trim() || '',
 			birthDate: date,
 		};
-		if (!isMounted.current) isMounted.current = true;
-
 		const errors: ValidationErrors = validateSchema(
 			formInputValues,
 			editProfileSchema
 		);
-
 		setValidationErrors(errors);
 		return Object.keys(errors).length === 0;
 	}, [date]);
 
-	useEffect(() => {
-		document.title = `Edit Profile | ${APP_NAME}`;
-	}, []);
+	const title = `Edit Profile | ${APP_NAME}`;
+	useDocumentTitle(title);
 
 	useEffect(() => {
-		if (isMounted.current) validate();
+		if (date) validate();
 	}, [date, validate]);
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -75,9 +75,9 @@ const Profile = () => {
 		setValidationErrors({});
 
 		if (!validate()) {
-			toast.error('Validation Error', {
+			notify.error('Validation Error', {
 				description: 'Please fix the errors in the form.',
-				icon: <XCircleIcon className="size-5 text-red-500" />,
+				requiresInternet: false,
 			});
 			return;
 		}
@@ -87,17 +87,28 @@ const Profile = () => {
 		formData.append('name', nameRef.current?.value as string);
 		formData.append('email', emailRef.current?.value as string);
 		formData.append('birthDate', (date || new Date()).toISOString());
-		if (file) formData.append('avatar', file);
+		if (file) {
+			formData.append('avatar', file);
+			if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+				notify.error("Can't upload file", {
+					description: `File too large. Max size is ${MAX_FILE_SIZE_MB}MB.`,
+				});
+				handleRemove();
+				return;
+			}
+		}
 
 		await updateProfile(formData);
 	};
 
-	const renderFieldError = (error?: string) =>
-		error && <p className="mt-1 text-sm text-red-500">{error}</p>;
-
 	return (
 		<div className="col-span-full flex h-full w-full items-center justify-center px-4 py-12">
-			<div className="w-full max-w-md py-8">
+			<motion.div
+				initial={{ opacity: 0, y: 30 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.5, ease: 'easeOut' }}
+				className="w-full max-w-md py-8"
+			>
 				<Card className="rounded-sm border-0 px-2 py-8">
 					<CardHeader>
 						<CardTitle className="mb-2 text-2xl">Edit Profile</CardTitle>
@@ -114,10 +125,15 @@ const Profile = () => {
 							encType="multipart/form-data"
 						>
 							<div>
-								<div className="mb-6 flex flex-col items-center gap-4">
+								<motion.div
+									initial={{ scale: 0.8, opacity: 0 }}
+									animate={{ scale: 1, opacity: 1 }}
+									transition={{ duration: 0.4 }}
+									className="mb-6 flex flex-col items-center gap-4"
+								>
 									<Avatar className="size-25 border-2 border-gray-50 shadow-md">
 										<AvatarImage
-											src={previewUrl || state.user?.avatar}
+											src={previewUrl || (state.user?.avatar as string)}
 											alt={`${state.user?.name}'s avatar`}
 										/>
 										<AvatarFallback className="text-xs">
@@ -144,7 +160,7 @@ const Profile = () => {
 											aria-label="Upload image file"
 										/>
 									</div>
-								</div>
+								</motion.div>
 								<label
 									htmlFor="name"
 									className="mb-1 block text-sm font-medium"
@@ -153,9 +169,10 @@ const Profile = () => {
 								</label>
 								<Input
 									ref={nameRef}
-									defaultValue={state.user?.name}
 									id="name"
 									name="name"
+									autoComplete="name"
+									defaultValue={state.user?.name}
 									placeholder="John Doe"
 								/>
 								{renderFieldError(validationErrors.name)}
@@ -170,6 +187,7 @@ const Profile = () => {
 								</label>
 								<Input
 									ref={emailRef}
+									autoComplete="email"
 									defaultValue={state.user?.email}
 									id="email"
 									name="email"
@@ -197,6 +215,9 @@ const Profile = () => {
 
 							<Button
 								type="submit"
+								disabled={
+									validationErrors && Object.keys(validationErrors).length > 0
+								}
 								className="w-full bg-blue-700 hover:bg-blue-600"
 							>
 								Save Changes
@@ -204,7 +225,7 @@ const Profile = () => {
 						</form>
 					</CardContent>
 				</Card>
-			</div>
+			</motion.div>
 		</div>
 	);
 };

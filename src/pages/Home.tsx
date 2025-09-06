@@ -1,13 +1,11 @@
 import { APP_NAME } from '@/constants/app';
-import { useLayoutEffect } from 'react';
 import FeaturedProducts from '@/components/section/FeaturedProducts';
 import HeroBanner from '@/components/section/HeroBanner';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 
 const Home = () => {
-	document.title = `${APP_NAME}`;
-	useLayoutEffect(() => {
-		return () => {};
-	}, []);
+	const title = `${APP_NAME}`;
+	useDocumentTitle(title);
 
 	return (
 		<>

@@ -1,6 +1,6 @@
-import useAxiosPrivate from '@/hooks/useAxiosPrivate';
+import useAxiosPrivate from '@/hooks/use-axios-private';
 import * as rawService from '@/services/productService';
-import { getProductsParams } from '@/types/api';
+import { getProductsParams, Category } from '@/types';
 import { useMemo } from 'react';
 
 // type AuthService = {
@@ -14,6 +14,10 @@ export function useProductService() {
 		() => ({
 			getProducts: (params: getProductsParams, controller: AbortController) =>
 				rawService.getProducts(axiosPrivate, params, controller),
+			getProductsByCategory: (
+				category: Category,
+				controller: AbortController
+			) => rawService.getProductsByCategory(axiosPrivate, category, controller),
 			searchProducts: (
 				params: { query: string },
 				controller: AbortController

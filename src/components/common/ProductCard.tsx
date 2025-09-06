@@ -1,4 +1,4 @@
-import { Product } from '@/types/api';
+import { Product } from '@/types';
 import { StarIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

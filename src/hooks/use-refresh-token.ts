@@ -1,16 +1,14 @@
 import axios from '@/services/api';
 import { API_ENDPOINTS } from '@/constants/app';
-import useAuth from './useAuth';
 import { tokenManager as token } from '@/lib/auth';
+import { useAuthState } from '@/contexts/authContexts';
+import { Refresh } from '@/types';
 
 const useRefreshToken = () => {
-	const { dispatch } = useAuth();
+	const { dispatch } = useAuthState();
 
-	const refresh = async () => {
+	const refresh: Refresh = async () => {
 		const response = await axios.get(API_ENDPOINTS.REFRESH, {
-			headers: {
-				'Content-Type': 'application/json',
-			},
 			withCredentials: true,
 		});
 

@@ -1,58 +1,85 @@
 import { API_ENDPOINTS } from '@/constants/app';
 import { getBase64 } from '@/utils/getBase64';
-import { AuthAction, AuthResponse, UserProfile } from '@/types/auth';
-import { tokenManager, userResetManager as userReset } from '@/lib/auth';
-import axios from '@/services/api';
+import { apiRequest } from '@/services/api';
 import { Axios } from 'axios';
-import { Dispatch } from 'react';
-import { LoginFormValues } from '@/types/form';
 import {
+	UserProfile,
+	LoginFormValues,
+	AuthResponse,
+	VerifyOtpResponse,
+	isApiError,
 	PasswordChangePayload,
 	RegisterRequestPayload,
 	ResetConfPasswordPayload,
 	ResetPasswordPayload,
-	Token,
 	VerifyOtpPayload,
-} from '@/types/api';
+	User,
+	PasswordResetResponse,
+	Token,
+} from '@/types';
 
 export async function register(data: RegisterRequestPayload) {
-	await axios.post(API_ENDPOINTS.REGISTER, data);
+	return apiRequest<User>(
+		{
+			url: API_ENDPOINTS.REGISTER,
+			method: 'POST',
+			data,
+		},
+		{
+			title: 'Registration successful. Please login.',
+			description: 'Your account has been created successfully.',
+		},
+		{ title: 'Registration failed' }
+	);
 }
 
-export async function login(
-	dispatch: Dispatch<AuthAction>,
-	data: LoginFormValues
-) {
-	const res: { data: AuthResponse } = await axios.post<AuthResponse>(
-		API_ENDPOINTS.LOGIN,
-		data,
+export async function login(data: LoginFormValues) {
+	return apiRequest<AuthResponse>(
 		{
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		}
+			url: API_ENDPOINTS.LOGIN,
+			method: 'POST',
+			data,
+		},
+		{
+			title: 'Login successful!',
+			description: 'You’re all set — let’s get started.',
+		},
+		{ title: 'Login failed' }
 	);
-	const { user, token } = res.data;
-	dispatch({ type: 'SET_USER', payload: user });
-	tokenManager.setAccessToken(token);
 }
 
 export async function logout(axios: Axios) {
-	await axios.delete(API_ENDPOINTS.LOGOUT);
-	tokenManager.clearToken();
+	return apiRequest<void>(
+		{
+			url: API_ENDPOINTS.LOGOUT,
+			method: 'DELETE',
+		},
+		undefined,
+		{ title: 'Logout failed' },
+		axios
+	);
 }
 
 export async function updateProfile(axios: Axios, data: FormData) {
 	const updatedData: Partial<UserProfile> = Object.fromEntries(data.entries());
-
-	if (updatedData.avatar instanceof File) {
+	if (updatedData.avatar instanceof File)
 		updatedData.avatar = await getBase64(updatedData.avatar);
-	}
 
-	await axios.put(API_ENDPOINTS.PROFILE, data, {
-		headers: { Authorization: `Bearer ${tokenManager.getAccessToken()}` },
-	});
+	const response = await apiRequest<User>(
+		{
+			url: API_ENDPOINTS.PROFILE,
+			method: 'PUT',
+			data,
+		},
+		{
+			title: 'Profile Updated',
+			description: 'Your profile has been updated successfully.',
+		},
+		{ title: 'Profile Update Failed' },
+		axios
+	);
 
+	if (isApiError(response)) return response;
 	return updatedData;
 }
 
@@ -60,62 +87,70 @@ export async function updatePassword(
 	axios: Axios,
 	data: PasswordChangePayload
 ) {
-	await axios.patch(API_ENDPOINTS.PASS_CHANGE, data, {
-		headers: { Authorization: `Bearer ${tokenManager.getAccessToken()}` },
-	});
+	return apiRequest<void>(
+		{
+			url: API_ENDPOINTS.PASS_CHANGE,
+			method: 'PATCH',
+			data,
+		},
+		{
+			title: 'Password Updated',
+			description: 'Your password has been updated successfully.',
+		},
+		{ title: 'Password Change Failed' },
+		axios
+	);
 }
 
 export async function resetPassword(data: ResetPasswordPayload) {
-	await axios.post(
-		API_ENDPOINTS.PASS_RESET_REQUEST,
+	return apiRequest<PasswordResetResponse>(
 		{
-			email: data.email,
+			url: API_ENDPOINTS.PASS_RESET_REQUEST,
+			method: 'POST',
+			data: { email: data.email },
 		},
-		{
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		}
+		{ title: 'Password reset OTP sent to your email.' },
+		{ title: 'Failed to send OTP.' }
 	);
-	userReset.set({ email: data.email });
 }
 
 export async function verifyOTP(data: VerifyOtpPayload) {
-	const res = await axios.post(API_ENDPOINTS.VERIFY_OTP, data, {
-		headers: {
-			'Content-Type': 'application/json',
+	return apiRequest<VerifyOtpResponse>(
+		{
+			url: API_ENDPOINTS.VERIFY_OTP,
+			method: 'POST',
+			data,
 		},
-	});
-	const resetToken = res.data.resetToken;
-	userReset.update({ resetToken });
+		undefined,
+		{ title: 'OTP incorrect.' }
+	);
 }
 
 export async function resetConfPassword(
 	axios: Axios,
 	data: ResetConfPasswordPayload
 ) {
-	await axios.patch(API_ENDPOINTS.PASS_RESET_CONFIRM, data, {
-		withCredentials: true,
-	});
+	return apiRequest<void>(
+		{
+			url: API_ENDPOINTS.PASS_RESET_CONFIRM,
+			method: 'PATCH',
+			data,
+			withCredentials: true,
+		},
+		undefined,
+		{ title: 'Failed to Reset Password.' },
+		axios
+	);
 }
 
-export async function refresh(dispatch: Dispatch<AuthAction>): Promise<Token> {
-	try {
-		const response = await axios.get(API_ENDPOINTS.REFRESH, {
-			headers: {
-				'Content-Type': 'application/json',
-			},
+export async function refresh() {
+	return apiRequest<Token>(
+		{
+			url: API_ENDPOINTS.REFRESH,
+			method: 'GET',
 			withCredentials: true,
-		});
-
-		dispatch({ type: 'SET_USER', payload: response.data.user });
-		tokenManager.setAccessToken(response.data.token);
-
-		return response.data.token;
-	} catch (error) {
-		console.error(error);
-		dispatch({ type: 'LOGOUT' });
-		tokenManager.clearToken();
-		return null;
-	}
+		},
+		undefined,
+		{ title: 'Session refresh failed' }
+	);
 }

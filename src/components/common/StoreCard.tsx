@@ -1,4 +1,4 @@
-import { Store } from '@/types/api';
+import { Store } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { Link } from 'react-router-dom';
 
@@ -11,12 +11,12 @@ const StoreCard = ({ store }: { store: Store }) => {
 			<figure className="relative h-32 w-full bg-gray-300">
 				<Avatar className="absolute bottom-0 left-5 flex size-15 translate-y-1/5 items-center justify-center overflow-hidden rounded-2xl ring-2 ring-gray-100">
 					<AvatarImage
-						src={store?.logo}
-						alt={`${store?.name}'s logo`}
+						src={store.logo}
+						alt={`${store.name}'s logo`}
 						className="size-full rounded-2xl object-cover"
 					/>
 					<AvatarFallback className="flex h-full w-full items-center justify-center bg-white text-xs">
-						{store?.name}
+						{store.name}
 					</AvatarFallback>
 				</Avatar>
 			</figure>

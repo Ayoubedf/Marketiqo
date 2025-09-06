@@ -10,8 +10,8 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { APP_ROUTES } from '@/constants/app';
-import useAuth from '@/hooks/useAuth';
-import { AuthContextProps, User } from '@/types/auth';
+import { useAuthActions, useAuthState } from '@/contexts/authContexts';
+import { AuthContextState, User } from '@/types';
 
 import {
 	BoltIcon,
@@ -23,21 +23,21 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 export default function ProfileMenu() {
-	const { state, logout } = useAuth() as AuthContextProps;
-	const user: User = state?.user || {
+	const { state } = useAuthState() as AuthContextState;
+	const { logout } = useAuthActions();
+	const DEFAULT_USER: User = {
 		name: 'Guest User',
 		email: 'guest@example.com',
 		avatar: '',
 	};
-	const userAvatar =
-		user.avatar ||
-		`https://ui-avatars.com/api/?name=${encodeURIComponent(
-			user.name
-		)}&background=random&color=fff&size=32&format=svg`;
+
+	const user: User = state.user ?? DEFAULT_USER;
 
 	const userInfo: User = {
 		...user,
-		avatar: userAvatar,
+		avatar:
+			user.avatar ||
+			`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random&color=fff&size=32&format=svg`,
 	};
 
 	const navigate = useNavigate();
@@ -55,7 +55,7 @@ export default function ProfileMenu() {
 				>
 					<Avatar>
 						<AvatarImage
-							src={userInfo?.avatar}
+							src={userInfo.avatar as string}
 							alt={`${userInfo.name}'s avatar`}
 						/>
 						<AvatarFallback className="text-xs">{userInfo.name}</AvatarFallback>
@@ -67,18 +67,18 @@ export default function ProfileMenu() {
 					/>
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className="max-w-64">
+			<DropdownMenuContent className="max-w-64 min-w-40">
 				<DropdownMenuLabel className="flex min-w-0 flex-col">
 					<span className="text-foreground truncate text-sm font-medium">
-						{userInfo?.name || 'Guest User'}
+						{userInfo.name}
 					</span>
 					<span className="text-muted-foreground truncate text-xs font-normal">
-						{userInfo?.email || 'guest@example.com'}
+						{userInfo.email}
 					</span>
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
-					{state?.user ? (
+					{state.user ? (
 						<>
 							<DropdownMenuItem onClick={() => navigate(APP_ROUTES.PROFILE)}>
 								<UserPenIcon
@@ -116,7 +116,7 @@ export default function ProfileMenu() {
 						</>
 					)}
 				</DropdownMenuGroup>
-				{state?.user && (
+				{state.user && (
 					<>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem onClick={handleLogout}>

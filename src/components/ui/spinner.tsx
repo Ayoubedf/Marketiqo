@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { cva } from 'class-variance-authority';
-import { Loader2 } from 'lucide-react';
+import { Loader } from 'lucide-react';
 import { ReactNode } from 'react';
 
 const spinnerVariants = cva('flex-col items-center justify-center', {
@@ -44,7 +44,10 @@ export default function Spinner({
 	return (
 		<div className="col-span-full flex h-full w-full items-center justify-center py-38">
 			<span className={spinnerVariants({ show })}>
-				<Loader2 className={cn(loaderVariants({ size }), className)} />
+				<Loader
+					className={cn(loaderVariants({ size }), className)}
+					strokeWidth={2}
+				/>
 				{children}
 			</span>
 		</div>

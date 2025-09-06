@@ -1,12 +1,12 @@
-import { ResetConfPasswordPayload } from '@/types/api';
-import { User } from '@/types/auth';
 import {
+	ResetConfPasswordPayload,
+	User,
 	AddProductFormValues,
 	LoginFormValues,
 	ManageStoreFormValues,
 	PasswordChangeFormValues,
 	RegisterFormValues,
-} from '@/types/form';
+} from '@/types';
 export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&.]).{8,}$/;
 
@@ -24,6 +24,7 @@ type FieldSchema = {
 	number?: boolean;
 	major?: boolean;
 	checked?: boolean;
+	message?: string;
 };
 
 export type ValidationSchema<T> = {
@@ -83,6 +84,10 @@ export const manageStoreSchema: ValidationSchema<
 		required: true,
 		minLength: 2,
 	},
+	categories: {
+		minLength: 1,
+		fieldName: 'category',
+	},
 };
 
 export const createStoreSchema: ValidationSchema<
@@ -92,6 +97,10 @@ export const createStoreSchema: ValidationSchema<
 		fieldName: 'Name',
 		required: true,
 		minLength: 2,
+	},
+	categories: {
+		minLength: 1,
+		fieldName: 'category',
 	},
 };
 
@@ -105,7 +114,10 @@ export const registerSchema: ValidationSchema<Partial<RegisterFormValues>> = {
 		required: true,
 		password: true,
 		fieldName: 'Password',
+	},
+	password_confirm: {
 		confirmed: true,
+		fieldName: 'Password Confirm',
 	},
 	birthDate: {
 		date: true,
@@ -123,12 +135,10 @@ export const resetPasswordSchema: ValidationSchema<
 		required: true,
 		password: true,
 		fieldName: 'Password',
-		confirmed: true,
 	},
 	password_confirm: {
-		required: true,
-		password: true,
-		fieldName: 'Password',
+		confirmed: true,
+		fieldName: 'Password Confirm',
 	},
 };
 
@@ -172,7 +182,7 @@ export function validateSchema<T extends Record<string, unknown>>(
 
 		// Required validation first
 		if (rules.required && !trimmedValue && trimmedValue !== 0) {
-			errors[key] = `${label} is required`;
+			errors[key] = rules.message ?? `${label} is required`;
 			continue;
 		}
 
@@ -182,7 +192,7 @@ export function validateSchema<T extends Record<string, unknown>>(
 			typeof trimmedValue === 'string' &&
 			!emailRegex.test(trimmedValue)
 		) {
-			errors[key] = 'Invalid email address';
+			errors[key] = rules.message ?? 'Invalid email address';
 			continue;
 		}
 
@@ -199,7 +209,7 @@ export function validateSchema<T extends Record<string, unknown>>(
 
 		// Confirm password
 		if (rules.confirmed && trimmedValue !== values['password']) {
-			errors[key] = 'Passwords do not match';
+			errors[key] = rules.message ?? 'Passwords do not match';
 			continue;
 		}
 
@@ -209,7 +219,19 @@ export function validateSchema<T extends Record<string, unknown>>(
 			typeof trimmedValue === 'string' &&
 			trimmedValue.length < rules.minLength
 		) {
-			errors[key] = `${label} must be at least ${rules.minLength} characters`;
+			errors[key] =
+				rules.message ??
+				`${label} must be at least ${rules.minLength} characters`;
+			continue;
+		}
+
+		if (
+			rules.minLength &&
+			Array.isArray(value) &&
+			value.length < rules.minLength
+		) {
+			errors[key] =
+				rules.message ?? `You must select at least ${rules.minLength} ${label}`;
 			continue;
 		}
 
@@ -219,31 +241,43 @@ export function validateSchema<T extends Record<string, unknown>>(
 			typeof trimmedValue === 'string' &&
 			trimmedValue.length > rules.maxLength
 		) {
-			errors[key] = `${label} must be at most ${rules.maxLength} characters`;
+			errors[key] =
+				rules.message ??
+				`${label} must be at most ${rules.maxLength} characters`;
+			continue;
+		}
+
+		if (
+			rules.maxLength &&
+			Array.isArray(value) &&
+			value.length < rules.maxLength
+		) {
+			errors[key] =
+				rules.message ?? `You must select at most ${rules.maxLength} ${label}`;
 			continue;
 		}
 
 		// Number required
 		if (rules.number && (trimmedValue === '' || isNaN(numValue))) {
-			errors[key] = `${label} is invalid`;
+			errors[key] = rules.message ?? `${label} is invalid`;
 			continue;
 		}
 
 		// Number min
 		if (rules.min && rules.number && numValue < rules.min) {
-			errors[key] = `${label} must be at least ${rules.min}`;
+			errors[key] = rules.message ?? `${label} must be at least ${rules.min}`;
 			continue;
 		}
 
 		// Number max
 		if (rules.max && rules.number && numValue > rules.max) {
-			errors[key] = `${label} must be at most ${rules.max}`;
+			errors[key] = rules.message ?? `${label} must be at most ${rules.max}`;
 			continue;
 		}
 
 		// Date required
 		if (rules.date && !(trimmedValue instanceof Date)) {
-			errors[key] = `${label} is not a valid date`;
+			errors[key] = rules.message ?? `${label} is not a valid date`;
 			continue;
 		}
 
@@ -253,13 +287,13 @@ export function validateSchema<T extends Record<string, unknown>>(
 			trimmedValue instanceof Date &&
 			new Date().getFullYear() - trimmedValue.getFullYear() < 18
 		) {
-			errors[key] = 'You must be at least 18 years old';
+			errors[key] = rules.message ?? 'You must be at least 18 years old';
 			continue;
 		}
 
 		// Checkbox
 		if (rules.checked && trimmedValue !== true) {
-			errors[key] = `${label} must be accepted`;
+			errors[key] = rules.message ?? `${label} must be accepted`;
 			continue;
 		}
 	}

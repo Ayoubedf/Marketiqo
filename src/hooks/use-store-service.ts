@@ -1,4 +1,4 @@
-import useAxiosPrivate from '@/hooks/useAxiosPrivate';
+import useAxiosPrivate from '@/hooks/use-axios-private';
 import * as rawService from '@/services/storeService';
 import { useMemo } from 'react';
 

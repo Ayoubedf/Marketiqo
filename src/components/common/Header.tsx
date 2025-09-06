@@ -29,10 +29,10 @@ import {
 	ChevronDownIcon,
 } from 'lucide-react';
 import { APP_NAME, APP_ROUTES } from '@/constants/app';
-import { Category } from '@/types/auth';
+import { Category } from '@/types';
 import UserProfileMenu from './ProfileMenu';
 import AppContext from '@/contexts/AppProvider';
-import { useDebouncedResize } from '@/hooks/useDebouncedResize';
+import { useDebouncedResize } from '@/hooks/use-debounced-resize';
 
 interface CategoryElement {
 	icon: JSX.Element;
@@ -98,17 +98,6 @@ const NavItems = ({ isOpen }: NavItemsProps) => {
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</li>
-			{/* <li>
-				<NavLink
-					to={APP_ROUTES.COLLECTIONS}
-					className={({ isActive }) =>
-						`nav-item ${isActive ? "text-primary" : "text-gray-700"}`
-					}
-					tabIndex={isOpen ? 0 : -1}
-				>
-					Collections
-				</NavLink>
-			</li> */}
 			<li>
 				<NavLink
 					to={APP_ROUTES.STORES}
@@ -136,7 +125,7 @@ const NavItems = ({ isOpen }: NavItemsProps) => {
 };
 
 const Header = () => {
-	const [isDrawerShown, setIsDrawerShown] = useState<boolean>(false);
+	const [isDrawerShown, setIsDrawerShown] = useState(false);
 	const isNavShown = useDebouncedResize();
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -153,6 +142,20 @@ const Header = () => {
 			if (queryRef.current) queryRef.current.value = '';
 		}
 	}, [location, location.pathname, query, setQuery]);
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+				e.preventDefault();
+				if (queryRef.current) queryRef.current.focus();
+			}
+		};
+
+		window.addEventListener('keydown', handleKeyDown);
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+		};
+	}, []);
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
@@ -187,6 +190,7 @@ const Header = () => {
 						<div className="flex items-center dark:text-white">
 							<Button
 								variant="ghost"
+								aria-label="open menu"
 								className="mx-2 h-10 w-12 bg-gray-50 shadow-sm md:hidden"
 								onClick={() => setIsDrawerShown(true)}
 							>

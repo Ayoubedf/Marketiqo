@@ -2,28 +2,23 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircleIcon } from 'lucide-react';
 import { APP_NAME, APP_ROUTES } from '@/constants/app';
 import { DatePicker } from '@/components/ui/date-picker';
 import UseAnimations from 'react-useanimations';
 import visibility from 'react-useanimations/lib/visibility2';
 import { registerSchema, validateSchema } from '@/utils/validations';
-import { useAuthService } from '@/hooks/useAuthService';
-import { AxiosError } from 'axios';
-import { RegisterRequestPayload } from '@/types/api';
+import { isApiError, RegisterRequestPayload } from '@/types';
+import { useAuthActions } from '@/contexts/authContexts';
+import { renderFieldError } from '@/utils/renderFieldError';
+import { motion } from 'framer-motion';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 
 interface ValidationErrors {
 	email?: string;
 	password?: string;
-	confirmPassword?: string;
+	password_confirm?: string;
 	birthDate?: string;
 	conditions?: string;
-}
-
-interface ErrorResponse {
-	status?: number;
-	message?: string;
 }
 
 const Register = () => {
@@ -34,36 +29,31 @@ const Register = () => {
 	const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
 		{}
 	);
-	const isMounted = useRef<boolean>(false);
 	const [date, setDate] = useState<Date | undefined>();
-	const [error, setError] = useState<ErrorResponse>({});
 	const [passwordVisibility, setPasswordVisibility] = useState(false);
 	const navigate = useNavigate();
-	const authService = useAuthService();
+	const authAction = useAuthActions();
 	const startDate = new Date(new Date().getFullYear() - 50, 0);
 	const endDate = new Date();
 
 	const validate = useCallback((): boolean => {
 		const formInputValues: RegisterRequestPayload = {
-			email: emailRef.current?.value?.toLowerCase().trim() as string,
-			password: passwordRef.current?.value?.trim() as string,
-			password_confirm: confirmPasswordRef.current?.value?.trim() as string,
+			email: emailRef.current?.value.toLowerCase().trim() as string,
+			password: passwordRef.current?.value.trim() as string,
+			password_confirm: confirmPasswordRef.current?.value.trim() as string,
 			birthDate: date,
 			conditions: conditionsRef.current?.checked as boolean,
 		};
-		if (!isMounted.current) isMounted.current = true;
-
 		const errors: ValidationErrors = validateSchema(
 			formInputValues,
 			registerSchema
 		);
-
 		setValidationErrors(errors);
 		return Object.keys(errors).length === 0;
 	}, [date]);
 
 	useEffect(() => {
-		if (isMounted.current) validate();
+		if (date) validate();
 	}, [date, validate]);
 
 	const resetForm = () => {
@@ -71,7 +61,6 @@ const Register = () => {
 		if (passwordRef.current) passwordRef.current.value = '';
 		if (confirmPasswordRef.current) confirmPasswordRef.current.value = '';
 		setValidationErrors({});
-		setError({});
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -85,52 +74,46 @@ const Register = () => {
 		};
 		e.preventDefault();
 		if (!validate()) return;
-		try {
-			await authService.register(data);
+
+		const response = await authAction.register(data);
+		if (!isApiError(response)) {
 			resetForm();
 			navigate(APP_ROUTES.LOGIN, {
 				replace: true,
-				state: { just_registered: true },
 			});
-		} catch (error) {
-			if (error instanceof AxiosError) {
-				if (!error.response)
-					setError({ status: 0, message: error.message || 'Network Error' });
-				else
-					setError({
-						status: error.response.status,
-						message:
-							error.message || 'An error occurred. Please try again later',
-					});
-			}
 		}
 	};
 
-	document.title = `Register | ${APP_NAME}`;
+	const title = `Register | ${APP_NAME}`;
+	useDocumentTitle(title);
 
 	return (
 		<>
 			<div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-				{error.status !== undefined && error.status != 200 && (
-					<Alert className="border border-red-200 bg-red-50 text-red-500 dark:border-red-500 dark:bg-red-900 dark:text-red-200">
-						<AlertCircleIcon />
-						<AlertTitle>{error.message}</AlertTitle>
-						<AlertDescription>
-							{error.status === 401
-								? 'Invalid email or password'
-								: 'An error occurred. Please try again later'}
-						</AlertDescription>
-					</Alert>
-				)}
 				<div className="text-center sm:mx-auto sm:w-full sm:max-w-sm">
-					<h2 className="mt-5 text-2xl/9 font-bold tracking-tight text-gray-800">
+					<motion.h1
+						initial={{ opacity: 0, y: -20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.5 }}
+						className="mt-5 text-2xl/9 font-bold tracking-tight text-gray-800"
+					>
 						Create Your Account
-					</h2>
-					<p className="mb-8 text-gray-500">
+					</motion.h1>
+					<motion.p
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ delay: 0.3 }}
+						className="mb-8 text-gray-500"
+					>
 						Create your account—your brand journey starts here.
-					</p>
+					</motion.p>
 				</div>
-				<div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
+				<motion.div
+					initial={{ opacity: 0, y: 40 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.5, ease: 'easeOut' }}
+					className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]"
+				>
 					<div className="border-slate-800 bg-white px-6 py-12 shadow shadow-gray-300 sm:rounded-lg sm:px-12 dark:border dark:bg-gray-900 dark:shadow-gray-800/50">
 						<div className="sm:mx-auto sm:w-full sm:max-w-sm">
 							<form
@@ -138,26 +121,6 @@ const Register = () => {
 								onChange={validate}
 								className="space-y-6"
 							>
-								{/* <div>
-									<label htmlFor='name' className='block text-sm/6 font-medium'>
-										Username
-									</label>
-									<div className='relative flex-1 mx-1 mt-2'>
-										<Input
-											ref={nameRef}
-											id='name'
-											name='name'
-											type='text'
-											autoComplete='user-name'
-											aria-invalid={validationErrors?.name != null}
-										/>
-									</div>
-									{validationErrors?.name && (
-										<p aria-live='assertive' className='text-red-500 text-xs mt-1'>
-											{validationErrors.name}
-										</p>
-									)}
-								</div> */}
 								<div>
 									<label
 										htmlFor="email"
@@ -173,17 +136,10 @@ const Register = () => {
 											type="email"
 											placeholder="john@doe.com"
 											autoComplete="email"
-											aria-invalid={validationErrors?.email != null}
+											aria-invalid={validationErrors.email != null}
 										/>
 									</div>
-									{validationErrors?.email && (
-										<p
-											aria-live="assertive"
-											className="mt-1 text-xs text-red-500"
-										>
-											{validationErrors.email}
-										</p>
-									)}
+									{renderFieldError(validationErrors.email)}
 								</div>
 
 								<div>
@@ -201,7 +157,7 @@ const Register = () => {
 											type={passwordVisibility ? 'text' : 'password'}
 											placeholder="secret1234@"
 											autoComplete="new-password"
-											aria-invalid={validationErrors?.password != null}
+											aria-invalid={validationErrors.password != null}
 										/>
 										<button
 											type="button"
@@ -211,7 +167,6 @@ const Register = () => {
 											className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center justify-around rounded-md p-1 transition-colors hover:bg-gray-200/50"
 										>
 											<UseAnimations
-												className="ua-icon"
 												animation={visibility}
 												onClick={() =>
 													setPasswordVisibility(!passwordVisibility)
@@ -220,14 +175,7 @@ const Register = () => {
 										</button>
 									</div>
 
-									{validationErrors?.password && (
-										<p
-											aria-live="assertive"
-											className="mt-1 text-xs text-red-500"
-										>
-											{validationErrors.password}
-										</p>
-									)}
+									{renderFieldError(validationErrors.password)}
 								</div>
 
 								<div>
@@ -245,17 +193,10 @@ const Register = () => {
 											type="password"
 											placeholder="secret1234@"
 											autoComplete="new-password"
-											aria-invalid={validationErrors?.confirmPassword != null}
+											aria-invalid={validationErrors.password_confirm != null}
 										/>
 									</div>
-									{validationErrors?.confirmPassword && (
-										<p
-											aria-live="assertive"
-											className="mt-1 text-xs text-red-500"
-										>
-											{validationErrors.confirmPassword}
-										</p>
-									)}
+									{renderFieldError(validationErrors.password_confirm)}
 								</div>
 
 								<div>
@@ -272,11 +213,7 @@ const Register = () => {
 										startDate={startDate}
 										endDate={endDate}
 									/>
-									{validationErrors.birthDate && (
-										<p className="mt-1 text-sm text-red-500">
-											{validationErrors.birthDate}
-										</p>
-									)}
+									{renderFieldError(validationErrors.birthDate)}
 								</div>
 
 								<div>
@@ -285,7 +222,7 @@ const Register = () => {
 											<input
 												ref={conditionsRef}
 												type="checkbox"
-												aria-invalid={validationErrors?.conditions != null}
+												aria-invalid={validationErrors.conditions != null}
 												className="peer h-5 w-5 appearance-none rounded border border-gray-200 shadow transition-all outline-none checked:border-blue-600 checked:bg-blue-600 hover:shadow-md focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
 												id="remember-me"
 											/>
@@ -310,11 +247,7 @@ const Register = () => {
 											Accept conditions
 										</label>
 									</div>
-									{validationErrors.conditions && (
-										<p className="mt-1 text-sm text-red-500">
-											{validationErrors.conditions}
-										</p>
-									)}
+									{renderFieldError(validationErrors.conditions)}
 								</div>
 
 								<Button
@@ -329,8 +262,13 @@ const Register = () => {
 							</form>
 						</div>
 					</div>
-				</div>
-				<p className="mt-10 text-center text-sm/6 text-gray-500">
+				</motion.div>
+				<motion.p
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ delay: 0.6 }}
+					className="mt-10 text-center text-sm/6 text-gray-500"
+				>
 					Already have an account?
 					<Link
 						to={APP_ROUTES.LOGIN}
@@ -338,7 +276,7 @@ const Register = () => {
 					>
 						Sign in
 					</Link>
-				</p>
+				</motion.p>
 			</div>
 		</>
 	);

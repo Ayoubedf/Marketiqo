@@ -1,18 +1,18 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { APP_ROUTES } from '@/constants/app';
+import { APP_NAME, APP_ROUTES } from '@/constants/app';
 import { useImageUpload } from '@/hooks/use-image-upload';
-import { Category, category } from '@/types/auth';
-import { StoreValidationErrors } from '@/types/form';
-import { CheckCircle2Icon, XCircleIcon } from 'lucide-react';
+import { Category, category, StoreValidationErrors, isApiError } from '@/types';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
-import { AxiosError } from 'axios';
+import { notify } from '@/lib/notify';
 import { useNavigate } from 'react-router-dom';
-import { useStoreService } from '@/hooks/useStoreService';
+import { useStoreService } from '@/hooks/use-store-service';
 import { renderFieldError } from '@/utils/renderFieldError';
 import { createStoreSchema, validateSchema } from '@/utils/validations';
+import { useAuthState } from '@/contexts/authContexts';
+import { motion } from 'framer-motion';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 
 export default function CreateStore() {
 	const {
@@ -23,32 +23,29 @@ export default function CreateStore() {
 		fileName,
 		handleRemove,
 	} = useImageUpload();
+	const { dispatch } = useAuthState();
 	const nameRef = useRef<HTMLInputElement>(null);
 	const descRef = useRef<HTMLTextAreaElement>(null);
-	const [categories, setCategories] = useState<string[]>([]);
-	const isMounted = useRef<boolean>(false);
+	const [categories, setCategories] = useState<Category[]>([]);
+	const categoriesUpdated = useRef(false);
 	const [validationErrors, setValidationErrors] =
 		useState<StoreValidationErrors>({});
 	const storeService = useStoreService();
 	const navigate = useNavigate();
+	const MAX_FILE_SIZE_MB = 5;
 
 	const validate = useCallback((): boolean => {
 		const formInputValues = {
-			name: nameRef.current?.value?.trim() || '',
+			name: nameRef.current?.value.trim() || '',
+			categories,
 		};
-		if (!isMounted.current) isMounted.current = true;
-
 		const errors: StoreValidationErrors = validateSchema(
 			formInputValues,
 			createStoreSchema
 		);
-
-		if (categories.length === 0)
-			errors.categories = 'You must select at least 1 category';
-
 		setValidationErrors(errors);
 		return Object.keys(errors).length === 0;
-	}, [categories.length]);
+	}, [categories]);
 
 	const resetForm = () => {
 		if (nameRef.current) nameRef.current.value = '';
@@ -65,42 +62,38 @@ export default function CreateStore() {
 		const formData = new FormData();
 		formData.append('name', nameRef.current?.value as string);
 		formData.append('description', descRef.current?.value as string);
-		if (file) formData.append('logo', file);
+		if (file) {
+			formData.append('logo', file);
+			if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+				notify.error("Can't upload file", {
+					description: `File too large. Max size is ${MAX_FILE_SIZE_MB}MB.`,
+				});
+				handleRemove();
+				return;
+			}
+		}
 		categories.forEach((category) => {
 			formData.append('categories', category);
 		});
 
 		if (!validate()) {
-			toast.error('Validation Error', {
+			notify.error('Validation Error', {
 				description: 'Please fix the errors in the form.',
-				icon: <XCircleIcon className="size-5 text-red-500" />,
+				requiresInternet: false,
 			});
 			return;
 		}
 
-		try {
-			await storeService.createStore(formData);
-			toast.success('Store Created', {
-				description: 'Your store has been created successfully.',
-				icon: <CheckCircle2Icon className="size-5 text-green-500" />,
-			});
+		const response = await storeService.createStore(formData);
+		if (!isApiError(response)) {
+			dispatch({ type: 'UPDATE_USER', payload: { role: 'merchant' } });
 			resetForm();
-
 			navigate(APP_ROUTES.STORES);
-		} catch (error) {
-			console.error('Error', error);
-
-			toast.error('failed to Create Store', {
-				description:
-					error instanceof AxiosError
-						? error.response?.data.error
-						: 'Something went wrong while creating the store.',
-				icon: <XCircleIcon className="size-5 text-red-500" />,
-			});
 		}
 	};
 
 	const handleChange = (category: Category) => {
+		if (!categoriesUpdated.current) categoriesUpdated.current = true;
 		setCategories((prev) =>
 			prev.includes(category)
 				? prev.filter((cat) => cat !== category)
@@ -109,24 +102,38 @@ export default function CreateStore() {
 	};
 
 	useEffect(() => {
-		if (isMounted.current) validate();
-	}, [categories, validate]);
+		if (categoriesUpdated.current) validate();
+	}, [categories.length, validate]);
+
+	const title = `Create Store | ${APP_NAME}`;
+	useDocumentTitle(title);
 
 	return (
 		<main className="mx-auto max-w-2xl px-4 py-20 text-center">
-			<h1 className="mb-4 text-4xl font-extrabold">
+			<motion.h1
+				initial={{ opacity: 0, y: -20 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.5 }}
+				className="mb-4 text-4xl font-extrabold"
+			>
 				Create Your Store with Marketiqo
-			</h1>
-			<p className="mb-8 text-gray-500">
+			</motion.h1>
+			<motion.p
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				transition={{ delay: 0.3 }}
+				className="mb-8 text-gray-500"
+			>
 				Launch your own store, showcase your products, and grow your brand with
 				ease.
-			</p>
+			</motion.p>
 
-			<form
-				action="/api/store/create"
+			<motion.form
 				onChange={validate}
-				method="POST"
 				onSubmit={handleSubmit}
+				initial={{ opacity: 0, y: 40 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.3, ease: 'easeOut' }}
 				className="space-y-6 rounded-xl border bg-white p-8 text-left shadow-sm"
 			>
 				<div>
@@ -244,18 +251,18 @@ export default function CreateStore() {
 						</div>
 						{renderFieldError(validationErrors.categories)}
 					</div>
-					{/* <div className="col-span-full mt-4">
-						<p className="text-sm font-semibold">Selected Categories:</p>
-						<pre className="text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded">
-							{JSON.stringify(categories, null, 2)}
-						</pre>
-					</div> */}
 				</div>
 
-				<Button type="submit" className="w-full bg-blue-700 hover:bg-blue-600">
+				<Button
+					type="submit"
+					disabled={
+						validationErrors && Object.keys(validationErrors).length > 0
+					}
+					className="w-full bg-blue-700 hover:bg-blue-600"
+				>
 					Create Store
 				</Button>
-			</form>
+			</motion.form>
 		</main>
 	);
 }

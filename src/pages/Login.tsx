@@ -1,18 +1,23 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Input } from '@shadcn/input';
 import { Button } from '@shadcn/button';
-import { Alert, AlertDescription, AlertTitle } from '@shadcn/alert';
-import { AlertCircleIcon } from 'lucide-react';
 import { API_ENDPOINTS, APP_NAME, APP_ROUTES } from '@/constants/app';
-import { LoginFormValues, ValidationErrors } from '@/types/form';
-import { ErrorResponse } from '@/types/auth';
-import { AxiosError } from 'axios';
+import {
+	LoginFormValues,
+	ValidationErrors,
+	ApiError,
+	isApiError,
+} from '@/types';
 import UseAnimations from 'react-useanimations';
 import visibility from 'react-useanimations/lib/visibility2';
 import env from '@/config/env';
 import { emailRegex, loginSchema, validateSchema } from '@/utils/validations';
-import { useAuthService } from '@/hooks/useAuthService';
+import { useAuthActions } from '@/contexts/authContexts';
+import { renderFieldError } from '@/utils/renderFieldError';
+import { motion } from 'framer-motion';
+import { notify } from '@/lib/notify';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 
 const Login = () => {
 	const emailRef = useRef<HTMLInputElement>(null);
@@ -22,14 +27,14 @@ const Login = () => {
 	const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
 		{}
 	);
-	const [error, setError] = useState<ErrorResponse>({});
-	const [passwordVisibility, setPasswordVisibility] = useState<boolean>(false);
-	const authService = useAuthService();
+	const [, setError] = useState<ApiError | null>(null);
+	const [passwordVisibility, setPasswordVisibility] = useState(false);
+	const authAction = useAuthActions();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const from = location.state?.from?.pathname || APP_ROUTES.HOME;
 
-	const validate = (): boolean => {
+	const validate = useCallback((): boolean => {
 		const formInputValues = {
 			email: emailRef.current?.value.toLowerCase().trim() || '',
 			password: passwordRef.current?.value.trim() || '',
@@ -40,14 +45,14 @@ const Login = () => {
 		);
 		setValidationErrors(errors);
 		return Object.keys(errors).length === 0;
-	};
+	}, []);
 
 	const resetForm = () => {
 		if (emailRef.current) emailRef.current.value = '';
 		if (passwordRef.current) passwordRef.current.value = '';
 		if (rememberRef.current) rememberRef.current.value = '';
 		setValidationErrors({});
-		setError({});
+		setError(null);
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -56,29 +61,21 @@ const Login = () => {
 			password: passwordRef.current?.value || '',
 		};
 		e.preventDefault();
-		if (!validate()) return;
+		if (!validate()) {
+			notify.error('Validation Error', {
+				description: 'Please fix the errors in the form.',
+				requiresInternet: false,
+			});
+			return;
+		}
 
-		try {
-			await authService.login(data);
+		const response = await authAction.login(data);
+		if (isApiError(response)) {
+			if (response.code === 'REQUEST_CANCELLED') return;
+			setError(response);
+		} else {
 			resetForm();
-			navigate(from, { replace: true, state: { just_logged: true } });
-		} catch (err) {
-			if (err instanceof AxiosError)
-				setError({
-					status: err.response?.status || 500,
-					message:
-						err.response?.data?.message || err.message || 'An error occurred',
-				});
-			else if (err instanceof Error)
-				setError({
-					status: 0,
-					message: err.message,
-				});
-			else
-				setError({
-					status: 0,
-					message: 'An unknown error occurred',
-				});
+			navigate(from, { replace: true });
 		}
 	};
 
@@ -86,39 +83,43 @@ const Login = () => {
 		e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
 	) => {
 		e.preventDefault();
-		if (!emailRegex.test(emailRef.current?.value?.trim() || '')) {
+		if (!emailRegex.test(emailRef.current?.value.trim() || '')) {
 			setValidationErrors({
 				email:
 					'Password must contain at least 8 characters, one letter, one number, and one special character',
 			});
 			return;
 		}
-		await authService.resetPassword({ email: emailRef.current?.value || '' });
-		navigate(APP_ROUTES.PASS_RESET);
+		const response = await authAction.resetPassword({
+			email: emailRef.current?.value || '',
+		});
+		if (!isApiError(response)) {
+			navigate(APP_ROUTES.PASS_RESET);
+		}
 	};
 
-	document.title = `Login | ${APP_NAME}`;
+	const title = `Login | ${APP_NAME}`;
+	useDocumentTitle(title);
 
 	return (
 		<>
 			<div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-				{error?.status !== undefined && error?.status != 200 && (
-					<Alert className="border border-red-200 bg-red-50 text-red-500 dark:border-red-500 dark:bg-red-900 dark:text-red-200">
-						<AlertCircleIcon className="" />
-						<AlertTitle>{error.statusText}</AlertTitle>
-						<AlertDescription>
-							{error.status === 401
-								? 'Invalid email or password'
-								: 'An error occurred. Please try again later'}
-						</AlertDescription>
-					</Alert>
-				)}
 				<div className="sm:mx-auto sm:w-full sm:max-w-sm">
-					<h2 className="mt-5 text-center text-2xl/9 font-bold tracking-tight text-gray-800">
+					<motion.h1
+						initial={{ opacity: 0, y: -20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.5 }}
+						className="mt-5 text-center text-2xl/9 font-bold tracking-tight text-gray-800"
+					>
 						Sign In To Your Account
-					</h2>
+					</motion.h1>
 				</div>
-				<div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
+				<motion.div
+					initial={{ opacity: 0, y: 40 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.5, ease: 'easeOut' }}
+					className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]"
+				>
 					<div className="border-slate-800 bg-white px-6 py-12 shadow shadow-gray-300 sm:rounded-lg sm:px-12 dark:border dark:bg-gray-900 dark:shadow-gray-800/50">
 						<div className="sm:mx-auto sm:w-full sm:max-w-sm">
 							<form
@@ -141,17 +142,10 @@ const Login = () => {
 											type="email"
 											placeholder="john@doe.com"
 											autoComplete="email"
-											aria-invalid={validationErrors?.email != null}
+											aria-invalid={validationErrors.email != null}
 										/>
 									</div>
-									{validationErrors?.email && (
-										<p
-											aria-live="assertive"
-											className="mt-1 text-xs text-red-500"
-										>
-											{validationErrors.email}
-										</p>
-									)}
+									{renderFieldError(validationErrors.email)}
 								</div>
 
 								<div>
@@ -169,7 +163,7 @@ const Login = () => {
 											type={passwordVisibility ? 'text' : 'password'}
 											placeholder="secret1234@"
 											autoComplete="current-password"
-											aria-invalid={validationErrors?.password != null}
+											aria-invalid={validationErrors.password != null}
 										/>
 										<button
 											type="button"
@@ -179,7 +173,6 @@ const Login = () => {
 											className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center justify-around rounded-md p-1 transition-colors hover:bg-gray-200/50"
 										>
 											<UseAnimations
-												className="ua-icon"
 												animation={visibility}
 												onClick={() =>
 													setPasswordVisibility(!passwordVisibility)
@@ -187,14 +180,7 @@ const Login = () => {
 											/>
 										</button>
 									</div>
-									{validationErrors?.password && (
-										<p
-											aria-live="assertive"
-											className="mt-1 text-xs text-red-500"
-										>
-											{validationErrors.password}
-										</p>
-									)}
+									{renderFieldError(validationErrors.password)}
 								</div>
 
 								<div className="flex justify-between">
@@ -310,16 +296,21 @@ const Login = () => {
 							</div>
 						</div>
 					</div>
-				</div>
-				<p className="mt-10 text-center text-sm/6 text-gray-500">
-					Don&apos;t you have an account?
+				</motion.div>
+				<motion.p
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ delay: 0.6 }}
+					className="mt-10 text-center text-sm/6 text-gray-500"
+				>
+					Don&apos;t have an account?
 					<Link
 						to={APP_ROUTES.REGISTER}
 						className="ms-1 font-semibold text-blue-600 hover:text-blue-500"
 					>
 						Register
 					</Link>
-				</p>
+				</motion.p>
 			</div>
 		</>
 	);

@@ -18,33 +18,38 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useRef, useState } from 'react';
 import { APP_NAME, APP_ROUTES } from '@/constants/app';
 import { userResetManager as userReset } from '@/lib/auth';
-import { useAuthService } from '@/hooks/useAuthService';
+import { useAuthActions } from '@/contexts/authContexts';
+import { isApiError } from '@/types';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 
 export default function OTPReset() {
 	const email = userReset.get()?.email || '';
 	const otpRef = useRef<HTMLInputElement>(null);
-	const authService = useAuthService();
+	const authAction = useAuthActions();
 	const navigate = useNavigate();
-	const [isResending, setIsResending] = useState<boolean>(false);
-	const [resendMessage, setResendMessage] = useState<string>('');
+	const [isResending, setIsResending] = useState(false);
+	const [isResent, setIsResent] = useState<boolean | null>(null);
 	const [resendCount, setResendCount] = useState<number>(0);
 	const [cooldown, setCooldown] = useState<number>(0);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const otp = otpRef.current?.value || '';
-		await authService.verifyOTP({ email, otp });
-		navigate(APP_ROUTES.PASS_CHANGE, { replace: true });
+		const response = await authAction.verifyOTP({ email, otp });
+		if (!isApiError(response)) {
+			navigate(APP_ROUTES.PASS_CHANGE, { replace: true });
+		}
 	};
 
 	const handleResend = async () => {
 		if (!email || cooldown > 0) return;
 		setIsResending(true);
-		setResendMessage('');
+		setIsResent(null);
 
-		try {
-			await authService.resetPassword({ email });
-			setResendMessage('A new OTP has been sent to your email.');
+		const response = await authAction.resetPassword({ email });
+		if (isApiError(response)) setIsResent(false);
+		else {
+			setIsResent(true);
 			setResendCount((prevCount) => prevCount + 1);
 
 			if (resendCount >= 2) {
@@ -59,16 +64,16 @@ export default function OTPReset() {
 					});
 				}, 1000);
 			}
-		} catch (error) {
-			console.error('Failed to resend OTP:', error);
-			setResendMessage('Failed to resend OTP. Please try again.');
-		} finally {
-			setIsResending(false);
 		}
+
+		setIsResending(false);
 	};
 
+	const title = `Verify OTP | ${APP_NAME}`;
+	useDocumentTitle(title);
+
 	if (!email) return <Navigate to={APP_ROUTES.HOME} />;
-	document.title = `Verify OTP | ${APP_NAME}`;
+
 	return (
 		<>
 			<div className="col-span-full flex h-full w-full items-center justify-center py-38">
@@ -123,8 +128,14 @@ export default function OTPReset() {
 											? `Resend in ${cooldown}s`
 											: 'Resend'}
 								</Button>
-								{resendMessage && (
-									<p className="mt-2 text-sm text-green-600">{resendMessage}</p>
+								{isResent !== null && (
+									<p
+										className={`mt-2 text-sm ${isResent ? 'text-green-600' : 'text-red-600'}`}
+									>
+										{isResent
+											? 'A new OTP has been sent to your email.'
+											: 'Failed to resend OTP. Please try again.'}
+									</p>
 								)}
 							</div>
 						</CardFooter>

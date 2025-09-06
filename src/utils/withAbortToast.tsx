@@ -1,5 +1,6 @@
+import { notify } from '@/lib/notify';
 import { CanceledError, isCancel } from 'axios';
-import { CircleAlertIcon, XCircleIcon } from 'lucide-react';
+import { CircleAlertIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 type WithAbortToast = ({
@@ -27,7 +28,7 @@ export const withAbortToast: WithAbortToast = async ({
 
 	const toastId = toast.info(label, {
 		description,
-		duration: duration,
+		duration,
 		action: {
 			label: actionLabel,
 			onClick: () => controller.abort(),
@@ -51,14 +52,13 @@ export const withAbortToast: WithAbortToast = async ({
 		await onConfirm(controller);
 	} catch (err) {
 		if (isCancel(err)) {
-			toast.info(`${label} Canceled`, {
+			notify.error(`${label} Canceled`, {
 				description: `The ${label.toLowerCase()} has been aborted.`,
-				icon: <XCircleIcon className="size-5 text-red-500" />,
+				requiresInternet: false,
 			});
 		} else {
-			toast.error(`${label} Failed`, {
+			notify.error(`${label} Failed`, {
 				description: `There was a problem with ${label.toLowerCase()}.`,
-				icon: <XCircleIcon className="size-5 text-red-500" />,
 			});
 			console.error(`${label} failed`, err);
 		}

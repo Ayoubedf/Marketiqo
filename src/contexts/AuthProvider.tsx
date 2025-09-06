@@ -1,66 +1,83 @@
 import {
-	createContext,
-	useRef,
-	useEffect,
 	ReactNode,
 	useCallback,
 	useReducer,
 	useMemo,
+	useEffect,
+	useState,
 } from 'react';
+import axios from '@/services/api';
 import {
-	AuthContextProps,
+	AuthActions,
+	AuthContextState,
+	Login,
+	Logout,
+	Register,
+	ResetConfPassword,
+	ResetPassword,
 	UpdatePassword,
 	UpdateProfile,
-	User,
-} from '@/types/auth';
-import { toast } from 'sonner';
-import { CheckCircle2Icon } from 'lucide-react';
+	VerifyOTP,
+	isApiError,
+} from '@/types';
 import { withAbortToast } from '@/utils/withAbortToast';
-import { tokenManager as token } from '@/lib/auth';
-// import { useAuthService } from '@/hooks/useAuthService';
+import { tokenManager, userResetManager } from '@/lib/auth';
 import * as rawService from '@/services/authService';
 import { authReducer } from './authReducer';
-import { PasswordChangePayload } from '@/types/api';
-import useAxiosPrivate from '@/hooks/useAxiosPrivate';
+import useAxiosPrivate from '@/hooks/use-axios-private';
+import { API_ENDPOINTS } from '@/constants/app';
+import { AuthActionsContext, AuthStateContext } from './authContexts';
 
-const AuthContext = createContext<AuthContextProps>({
-	state: { user: null },
-	dispatch: () => {},
-	updateProfile: async () => {},
-	updatePassword: async () => {},
-	logout: async () => {},
-});
-
-interface AuthProviderProps {
-	children: ReactNode;
-}
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [state, dispatch] = useReducer(authReducer, { user: null });
-	// const authService = useAuthService();
-	const axiosPrivate = useAxiosPrivate();
-	const isMounted = useRef(true);
+	const [loading, setLoading] = useState(true);
+	const value: AuthContextState = useMemo(
+		() => ({
+			state,
+			loading,
+			dispatch,
+		}),
+		[loading, state]
+	);
 
 	useEffect(() => {
-		isMounted.current = true;
-		return () => {
-			isMounted.current = false;
+		const initAuth = async () => {
+			try {
+				const response = await axios.get(API_ENDPOINTS.REFRESH, {
+					withCredentials: true,
+				});
+				dispatch({ type: 'SET_USER', payload: response.data.user });
+				tokenManager.setAccessToken(response.data.token);
+			} catch {
+				dispatch({ type: 'LOGOUT' });
+				tokenManager.clearToken();
+			} finally {
+				setLoading(false);
+			}
 		};
+		initAuth();
 	}, []);
 
-	const logout = useCallback(async () => {
-		try {
-			await rawService.logout(axiosPrivate);
-			if (isMounted.current) {
-				dispatch({ type: 'LOGOUT' });
-				token.clearToken();
-			}
-		} catch (err) {
-			console.error('Logout failed', err);
-			toast.error('Logout failed', {
-				description: 'Something went wrong while logging out.',
-			});
+	const axiosPrivate = useAxiosPrivate();
+
+	const register: Register = useCallback(async (data) => {
+		return await rawService.register(data);
+	}, []);
+
+	const login: Login = useCallback(async (data) => {
+		const response = await rawService.login(data);
+		if (!isApiError(response)) {
+			dispatch({ type: 'SET_USER', payload: response.user });
+			tokenManager.setAccessToken(response.token);
 		}
+		return response;
+	}, []);
+
+	const logout: Logout = useCallback(async () => {
+		const response = await rawService.logout(axiosPrivate);
+		dispatch({ type: 'LOGOUT' });
+		tokenManager.clearToken();
+		return response;
 	}, [axiosPrivate]);
 
 	const updateProfile: UpdateProfile = useCallback(
@@ -70,40 +87,36 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				description: 'Your profile is being updated.',
 				duration: 3000,
 				onConfirm: async (controller) => {
-					const updatedData = await rawService.updateProfile(
+					const updatedProfile = await rawService.updateProfile(
 						axiosPrivate,
 						data
 					);
 
 					if (!controller.signal.aborted) {
-						const updatedUser = { ...state.user, ...updatedData } as User;
-						toast.success('Profile Updated', {
-							description: 'Your profile has been updated successfully.',
-							icon: <CheckCircle2Icon className="size-5 text-green-500" />,
-						});
-						if (isMounted.current)
-							dispatch({ type: 'SET_USER', payload: updatedUser });
+						if (!isApiError(updatedProfile)) {
+							dispatch({
+								type: 'UPDATE_USER',
+								payload: updatedProfile,
+							});
+						}
 					}
 				},
 			});
 		},
-		[axiosPrivate, state.user]
+		[axiosPrivate]
 	);
 
 	const updatePassword: UpdatePassword = useCallback(
-		async (data: PasswordChangePayload) => {
+		async (data) => {
 			await withAbortToast({
 				label: 'Updating Password',
 				description: 'Your password is being updated.',
 				onConfirm: async (controller) => {
-					await rawService.updatePassword(axiosPrivate, data);
-
+					const response = await rawService.updatePassword(axiosPrivate, data);
 					if (!controller.signal.aborted) {
-						toast.success('Password Updated', {
-							description: 'Your password has been updated successfully.',
-							icon: <CheckCircle2Icon className="size-5 text-green-500" />,
-						});
-						if (isMounted.current) await logout();
+						if (!isApiError(response)) {
+							await logout();
+						}
 					}
 				},
 			});
@@ -111,18 +124,47 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 		[axiosPrivate, logout]
 	);
 
-	const value = useMemo(
-		() => ({
-			state,
-			dispatch,
-			updateProfile,
-			updatePassword,
-			logout,
-		}),
-		[state, updateProfile, updatePassword, logout]
+	const resetPassword: ResetPassword = useCallback(async (data) => {
+		const response = await rawService.resetPassword(data);
+		if (!isApiError(response)) {
+			userResetManager.set({ email: data.email });
+			console.log(response);
+		}
+		return response;
+	}, []);
+
+	const resetConfPassword: ResetConfPassword = useCallback(
+		async (data) => {
+			return await rawService.resetConfPassword(axiosPrivate, data);
+		},
+		[axiosPrivate]
 	);
 
-	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
+	const verifyOTP: VerifyOTP = useCallback(async (data) => {
+		const verificationData = await rawService.verifyOTP(data);
+		if (!isApiError(verificationData)) {
+			const resetToken = verificationData.resetToken;
+			userResetManager.update({ resetToken });
+		}
+		return verificationData;
+	}, []);
 
-export default AuthContext;
+	const actions: AuthActions = {
+		register,
+		login,
+		logout,
+		updateProfile,
+		updatePassword,
+		resetPassword,
+		resetConfPassword,
+		verifyOTP,
+	};
+
+	return (
+		<AuthStateContext.Provider value={value}>
+			<AuthActionsContext.Provider value={actions}>
+				{children}
+			</AuthActionsContext.Provider>
+		</AuthStateContext.Provider>
+	);
+};

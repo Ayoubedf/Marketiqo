@@ -1,38 +1,21 @@
-import { useEffect, useState } from 'react';
-import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import useRefreshToken from '@/hooks/useRefreshToken';
-import Spinner from '@/components/ui/spinner';
-import { APP_ROUTES } from '@/constants/app';
-import { tokenManager } from '@/lib/auth';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuthState } from '@/contexts/authContexts';
+import Spinner from '../ui/spinner';
 
 const RequireAuth = () => {
+	const { state, loading } = useAuthState();
 	const location = useLocation();
-	const navigate = useNavigate();
-	const refresh = useRefreshToken();
-	const [loading, setLoading] = useState(true);
 
-	useEffect(() => {
-		const verifyAuth = async () => {
-			try {
-				if (!tokenManager.getAccessToken())
-					if (!(await refresh())) throw new Error('Token refresh failed');
-			} catch {
-				navigate(APP_ROUTES.LOGIN, {
-					replace: true,
-					state: { from: location },
-				});
-			} finally {
-				setLoading(false);
-			}
-		};
-		verifyAuth();
-	}, [location, navigate, refresh]);
-
-	if (loading) return <Spinner />;
-	if (!tokenManager.getAccessToken())
+	if (loading)
 		return (
-			<Navigate to={APP_ROUTES.LOGIN} state={{ from: location }} replace />
+			<div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80">
+				<Spinner size="medium">
+					<span className="mt-5 text-xs">Loading your account…</span>
+				</Spinner>
+			</div>
 		);
+	if (!state.user)
+		return <Navigate to="/login" state={{ from: location }} replace />;
 
 	return <Outlet />;
 };

@@ -1,5 +1,4 @@
-import { Token } from '@/types/api';
-import { UserReset } from '@/types/auth';
+import { Token, UserReset } from '@/types';
 type TokenListener = (token: Token) => void;
 
 export class TokenManager {
@@ -15,14 +14,14 @@ export class TokenManager {
 		return this.accessToken;
 	}
 
-	public subscribe(listener: TokenListener) {
-		this.listeners.add(listener);
-		return () => this.listeners.delete(listener); // unsubscribe
-	}
-
 	public clearToken() {
 		this.accessToken = null;
 		this.notify();
+	}
+
+	public subscribe(listener: TokenListener) {
+		this.listeners.add(listener);
+		return () => this.listeners.delete(listener); // unsubscribe
 	}
 
 	private notify() {

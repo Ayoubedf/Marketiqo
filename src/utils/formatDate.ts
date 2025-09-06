@@ -1,4 +1,4 @@
-import { StructuredDate } from '@/types/form';
+import { StructuredDate } from '@/types';
 
 export const formatDate = (date: Date): string => {
 	return date.toLocaleDateString();

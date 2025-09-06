@@ -1,27 +1,57 @@
 import { API_ENDPOINTS } from '@/constants/app';
-import { getProductsParams } from '@/types/api';
+import { getProductsParams, Product, Category } from '@/types';
 import { Axios } from 'axios';
+import { apiRequest } from './api';
 
 export async function getProducts(
 	axios: Axios,
 	params: getProductsParams,
-	controller: AbortController
+	controller?: AbortController
 ) {
-	const res = await axios.get(API_ENDPOINTS.PRODUCTS, {
-		params,
-		signal: controller.signal,
-	});
-	return res;
+	return apiRequest<Product[]>(
+		{
+			url: API_ENDPOINTS.PRODUCTS,
+			method: 'GET',
+			params,
+			signal: controller?.signal,
+		},
+		undefined,
+		undefined,
+		axios
+	);
+}
+
+export async function getProductsByCategory(
+	axios: Axios,
+	category: Category,
+	controller?: AbortController
+) {
+	return apiRequest<Product[]>(
+		{
+			url: `${API_ENDPOINTS.PRODUCTS}/${category}`,
+			method: 'GET',
+			signal: controller?.signal,
+		},
+		undefined,
+		undefined,
+		axios
+	);
 }
 
 export async function searchProducts(
 	axios: Axios,
 	params: { query: string },
-	controller: AbortController
+	controller?: AbortController
 ) {
-	const res = await axios.get(API_ENDPOINTS.PRODUCTS_SEARCH, {
-		params,
-		signal: controller.signal,
-	});
-	return res;
+	return apiRequest<Product[]>(
+		{
+			url: API_ENDPOINTS.PRODUCTS_SEARCH,
+			method: 'GET',
+			params,
+			signal: controller?.signal,
+		},
+		undefined,
+		undefined,
+		axios
+	);
 }
