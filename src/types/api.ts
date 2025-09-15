@@ -4,6 +4,18 @@ import { SentMessageInfo } from 'nodemailer';
 
 export type Token = string | null;
 
+export interface AccessTokenPayload {
+	id: string;
+	iat: number;
+	exp: number;
+}
+
+export interface ResetTokenPayload {
+	email: string;
+	iat: number;
+	exp: number;
+}
+
 export interface ApiResponse<T> {
 	data: T;
 	status: number;
@@ -17,6 +29,16 @@ export interface RegisterRequestPayload {
 	password_confirm: string;
 	birthDate: Date | undefined;
 	conditions: boolean;
+}
+
+export interface CompleteProfilePayload {
+	oauth_id: string;
+	oauth_provider: string;
+	avatar: File | string;
+	email: string;
+	isVerified: boolean;
+	name: string;
+	birthDate: Date | string | undefined;
 }
 
 export interface PasswordChangePayload {
@@ -43,6 +65,10 @@ export interface ResetConfPasswordPayload {
 export interface getProductsParams {
 	category?: Category | null;
 	pageSize?: number;
+}
+
+export interface searchProductsParams {
+	query: string;
 }
 
 export interface Product {

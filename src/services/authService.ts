@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from '@/constants/app';
+import { API_ENDPOINTS } from '@/config/constants';
 import { getBase64 } from '@/utils/getBase64';
 import { apiRequest } from '@/services/api';
 import { Axios } from 'axios';
@@ -22,6 +22,21 @@ export async function register(data: RegisterRequestPayload) {
 	return apiRequest<User>(
 		{
 			url: API_ENDPOINTS.REGISTER,
+			method: 'POST',
+			data,
+		},
+		{
+			title: 'Registration successful. Please login.',
+			description: 'Your account has been created successfully.',
+		},
+		{ title: 'Registration failed' }
+	);
+}
+
+export async function completeProfile(data: FormData) {
+	return await apiRequest<User>(
+		{
+			url: API_ENDPOINTS.COMPLETE_PROFILE,
 			method: 'POST',
 			data,
 		},

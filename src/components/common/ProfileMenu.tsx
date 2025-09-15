@@ -9,8 +9,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { APP_ROUTES } from '@/constants/app';
-import { useAuthActions, useAuthState } from '@/contexts/authContexts';
+import { APP_ROUTES } from '@/config/constants';
+import { useAuthActions, useAuthState } from '@/features/auth';
 import { AuthContextState, User } from '@/types';
 
 import {
@@ -43,7 +43,7 @@ export default function ProfileMenu() {
 	const navigate = useNavigate();
 	const handleLogout = () => {
 		logout();
-		navigate(APP_ROUTES.LOGIN);
+		navigate(APP_ROUTES.LOGIN, { replace: true });
 	};
 
 	return (
@@ -90,7 +90,13 @@ export default function ProfileMenu() {
 							</DropdownMenuItem>
 
 							{state.user.role === 'merchant' && (
-								<DropdownMenuItem onClick={() => navigate(APP_ROUTES.STORE)}>
+								<DropdownMenuItem
+									onClick={() =>
+										navigate(
+											`${APP_ROUTES.STORES}/${user.store?._id || user.store}`
+										)
+									}
+								>
 									<StoreIcon
 										size={16}
 										className="opacity-60"

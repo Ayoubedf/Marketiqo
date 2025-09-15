@@ -1,0 +1,122 @@
+import { motion } from 'framer-motion';
+import useCreateStore from '../../hooks/use-create-store';
+import { Input } from '@/components/ui/input';
+import { renderFieldError } from '@/utils/renderFieldError';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { CategoryCheckboxes } from '@/components/common/CategoryCheckboxes';
+
+export const CreateStore = () => {
+	const {
+		fileName,
+		handleChange,
+		handleFileChange,
+		handleSubmit,
+		handleThumbnailClick,
+		previewUrl,
+		refs: { descRef, fileInputRef, nameRef },
+		validate,
+		validationErrors,
+		categories,
+	} = useCreateStore();
+
+	return (
+		<motion.form
+			onChange={validate}
+			onSubmit={handleSubmit}
+			initial={{ opacity: 0, y: 40 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.3, ease: 'easeOut' }}
+			className="space-y-6 rounded-xl border bg-white p-8 text-left shadow-sm"
+		>
+			<div>
+				<label
+					htmlFor="name"
+					className="block text-sm font-medium text-gray-700"
+				>
+					Store Name
+				</label>
+				<Input
+					ref={nameRef}
+					id="name"
+					name="name"
+					type="name"
+					autoComplete="name"
+				/>
+				{renderFieldError(validationErrors.name)}
+			</div>
+
+			<div>
+				<label
+					htmlFor="description"
+					className="block text-sm font-medium text-gray-700"
+				>
+					Description
+				</label>
+				<Textarea
+					ref={descRef}
+					id="description"
+					name="description"
+					className="resize-none"
+				/>
+			</div>
+			<div className="space-y-2">
+				<label
+					htmlFor="logo-upload"
+					className="block text-sm font-medium text-gray-700"
+				>
+					Upload Logo
+				</label>
+				{previewUrl && (
+					<div className="mb-2 flex justify-center">
+						<img
+							src={previewUrl}
+							alt="Logo preview"
+							className="max-h-40 w-full max-w-xs rounded border object-contain shadow-2xs"
+						/>
+					</div>
+				)}
+				<Button
+					variant="outline"
+					type="button"
+					onClick={handleThumbnailClick}
+					aria-haspopup="dialog"
+				>
+					{fileName ? 'Change image' : 'Upload image'}
+				</Button>
+				<input
+					id="logo-upload"
+					name="logo"
+					type="file"
+					ref={fileInputRef}
+					onChange={handleFileChange}
+					className="hidden"
+					accept="image/*"
+					aria-label="Upload image file"
+				/>
+			</div>
+			<div className="space-y-2">
+				<label className="block text-sm font-medium text-gray-700">
+					Categories
+				</label>
+				<div className="mt-4 mb-8">
+					<div className="mb-4 grid grid-cols-2 gap-y-3 sm:grid-cols-3 md:grid-cols-4">
+						<CategoryCheckboxes
+							categories={categories}
+							handleChange={handleChange}
+						/>
+					</div>
+					{renderFieldError(validationErrors.categories)}
+				</div>
+			</div>
+
+			<Button
+				type="submit"
+				disabled={validationErrors && Object.keys(validationErrors).length > 0}
+				className="w-full bg-blue-700 hover:bg-blue-600"
+			>
+				Create Store
+			</Button>
+		</motion.form>
+	);
+};

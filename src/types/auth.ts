@@ -16,17 +16,15 @@ import {
 
 export interface User {
 	_id?: string;
+	oauth_id?: string;
+	oauth_provider?: string;
+	isVerified?: boolean;
 	name: string;
 	email: string;
 	birthDate?: Date;
 	role?: string;
 	store?: Store;
 	avatar: File | string;
-}
-
-export interface UserReset {
-	email: string;
-	resetToken?: Token;
 }
 
 export interface Auth {
@@ -47,6 +45,9 @@ export interface UserProfile {
 
 export type Register = (
 	data: RegisterRequestPayload
+) => Promise<User | ApiError | void>;
+export type CompleteProfile = (
+	data: FormData
 ) => Promise<User | ApiError | void>;
 export type Login = (
 	data: LoginFormValues
@@ -70,11 +71,14 @@ export type Refresh = () => Promise<Token>;
 export interface AuthContextState {
 	state: Auth;
 	loading: boolean;
+	isAuthenticated: boolean;
+	isOAuthUser: boolean;
 	dispatch: Dispatch<AuthAction>;
 }
 
 export interface AuthActions {
 	register: Register;
+	completeProfile: CompleteProfile;
 	login: Login;
 	updateProfile: UpdateProfile;
 	updatePassword: UpdatePassword;
@@ -84,7 +88,7 @@ export interface AuthActions {
 	logout: Logout;
 }
 
-export const category = [
+export const categoryList = [
 	'cosmetics',
 	'electronics',
 	'apparels',
@@ -92,7 +96,7 @@ export const category = [
 	'furnitures',
 	'books',
 ] as const;
-export type Category = (typeof category)[number];
+export type Category = (typeof categoryList)[number];
 
 export interface ErrorResponse {
 	status?: number;

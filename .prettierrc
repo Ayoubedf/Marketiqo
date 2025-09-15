@@ -5,5 +5,5 @@
 	"semi": true,
 	"singleQuote": true,
 	"useTabs": true,
-	"endOfLine": "lf"
+	"endOfLine": "crlf"
 }

@@ -1,4 +1,4 @@
-import { APP_NAME, APP_ROUTES } from '@/constants/app';
+import { APP_NAME, APP_ROUTES } from '@/config/constants';
 import { Button } from '@shadcn/button';
 import { ArrowLeftIcon, HomeIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';

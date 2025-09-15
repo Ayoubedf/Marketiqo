@@ -1,5 +1,10 @@
-import { API_ENDPOINTS } from '@/constants/app';
-import { getProductsParams, Product, Category } from '@/types';
+import { API_ENDPOINTS } from '@/config/constants';
+import {
+	getProductsParams,
+	Product,
+	Category,
+	searchProductsParams,
+} from '@/types';
 import { Axios } from 'axios';
 import { apiRequest } from './api';
 
@@ -40,7 +45,7 @@ export async function getProductsByCategory(
 
 export async function searchProducts(
 	axios: Axios,
-	params: { query: string },
+	params: searchProductsParams,
 	controller?: AbortController
 ) {
 	return apiRequest<Product[]>(

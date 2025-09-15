@@ -1,12 +1,12 @@
-import { itemVariants } from '@/constants/motion';
+import { itemVariants } from '@/animations';
 import { motion } from 'framer-motion';
 
 type Props = { title: string; reason?: string };
 
 const ErrorMessage = ({ title, reason }: Props) => (
 	<motion.div
-		initial={{ opacity: 0, y: 20 }}
-		animate={{ opacity: 1, y: 0 }}
+		initial="hidden"
+		animate="show"
 		transition={{ duration: 0.4 }}
 		className="col-span-full mx-auto w-full px-4 py-2"
 		variants={itemVariants}

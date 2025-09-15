@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from '@/constants/app';
+import { API_ENDPOINTS } from '@/config/constants';
 import { Store } from '@/types';
 import { Axios } from 'axios';
 import { apiRequest } from './api';
@@ -21,7 +21,7 @@ export async function createStore(axios: Axios, data: FormData) {
 	);
 }
 
-export async function getStores(axios: Axios, controller: AbortController) {
+export async function getStores(axios: Axios, controller?: AbortController) {
 	return apiRequest<Store[]>(
 		{
 			url: API_ENDPOINTS.STORE,
@@ -36,8 +36,8 @@ export async function getStores(axios: Axios, controller: AbortController) {
 
 export async function getStore(
 	axios: Axios,
-	controller: AbortController,
-	id: string
+	id: string,
+	controller?: AbortController
 ) {
 	return apiRequest<Store>(
 		{

@@ -5,6 +5,10 @@ export interface LoginFormValues {
 	password: string;
 }
 
+export interface ForgotPasswordFormValues {
+	email: string;
+}
+
 export interface PasswordChangeFormValues {
 	current_password: string;
 	password: string;
@@ -32,6 +36,7 @@ export interface ManageStoreFormValues {
 }
 
 export interface ValidationErrors {
+	name?: string;
 	email?: string;
 	password?: string;
 	password_confirm?: string;
