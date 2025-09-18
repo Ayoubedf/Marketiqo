@@ -13,16 +13,13 @@ export function PasswordChange() {
 		newPasswordVisibility,
 		setCurrentPasswordVisibility,
 		setNewPasswordVisibility,
-		validate,
+		validateField,
 		validationErrors,
+		isSubmitting,
 	} = useSettings();
 
 	return (
-		<form
-			onSubmit={handlePasswordUpdate}
-			onChange={validate}
-			className="space-y-4"
-		>
+		<form onSubmit={handlePasswordUpdate} noValidate className="space-y-4">
 			<div>
 				<label
 					htmlFor="currentPassword"
@@ -38,20 +35,35 @@ export function PasswordChange() {
 						autoComplete="current-password"
 						type={currentPasswordVisibility ? 'text' : 'password'}
 						placeholder="Enter your current password"
+						aria-invalid={!!validationErrors.current_password}
+						aria-required="true"
+						aria-describedby={
+							validationErrors.current_password
+								? 'current-password-error'
+								: undefined
+						}
+						onBlur={() => validateField('current_password')}
 					/>
 					<button
 						type="button"
-						className="absolute top-1/2 right-2 -translate-y-1/2 rounded-md p-1 hover:bg-gray-200/50"
+						onClick={() =>
+							setCurrentPasswordVisibility(!currentPasswordVisibility)
+						}
+						aria-label={
+							currentPasswordVisibility ? 'Hide password' : 'Show password'
+						}
+						className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center justify-around rounded-md p-1 transition-colors hover:bg-gray-200/50"
 					>
 						<UseAnimations
 							animation={visibility}
-							onClick={() =>
-								setCurrentPasswordVisibility(!currentPasswordVisibility)
-							}
+							reverse={currentPasswordVisibility}
 						/>
 					</button>
 				</div>
-				{renderFieldError(validationErrors.current_password)}
+				{renderFieldError(
+					validationErrors.current_password,
+					'current-password'
+				)}
 			</div>
 
 			<div>
@@ -66,18 +78,28 @@ export function PasswordChange() {
 						autoComplete="new-password"
 						type={newPasswordVisibility ? 'text' : 'password'}
 						placeholder="Enter your new password"
+						aria-invalid={!!validationErrors.password}
+						aria-required="true"
+						aria-describedby={
+							validationErrors.password ? 'password-error' : undefined
+						}
+						onBlur={() => validateField('password')}
 					/>
 					<button
 						type="button"
-						className="absolute top-1/2 right-2 -translate-y-1/2 rounded-md p-1 hover:bg-gray-200/50"
+						onClick={() => setNewPasswordVisibility(!newPasswordVisibility)}
+						aria-label={
+							newPasswordVisibility ? 'Hide password' : 'Show password'
+						}
+						className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center justify-around rounded-md p-1 transition-colors hover:bg-gray-200/50"
 					>
 						<UseAnimations
 							animation={visibility}
-							onClick={() => setNewPasswordVisibility(!newPasswordVisibility)}
+							reverse={newPasswordVisibility}
 						/>
 					</button>
 				</div>
-				{renderFieldError(validationErrors.password)}
+				{renderFieldError(validationErrors.password, 'new-password')}
 			</div>
 
 			<div>
@@ -94,15 +116,23 @@ export function PasswordChange() {
 					autoComplete="new-password"
 					type="password"
 					placeholder="Confirm your new password"
+					aria-invalid={!!validationErrors.password_confirm}
+					aria-required="true"
+					aria-describedby={
+						validationErrors.password_confirm
+							? 'password-confirm-error'
+							: undefined
+					}
+					onBlur={() => validateField('password_confirm')}
 				/>
-				{renderFieldError(validationErrors.password_confirm)}
+				{renderFieldError(
+					validationErrors.password_confirm,
+					'password-confirm'
+				)}
 			</div>
 
-			<Button
-				disabled={validationErrors && Object.keys(validationErrors).length > 0}
-				type="submit"
-			>
-				Change Password
+			<Button disabled={isSubmitting} type="submit">
+				{isSubmitting ? 'Updating...' : 'Update Password'}
 			</Button>
 		</form>
 	);

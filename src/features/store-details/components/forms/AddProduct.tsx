@@ -15,17 +15,14 @@ export const AddProduct = () => {
 	const {
 		refs: { nameRef, descRef, priceRef },
 		preview,
-		validate,
+		validateField,
 		validationErrors,
 		handleSubmit,
+		isSubmitting,
 	} = useAddProduct();
 
 	return (
-		<form
-			onChange={validate}
-			onSubmit={handleSubmit}
-			className="py-6 pr-10 pl-6"
-		>
+		<form onSubmit={handleSubmit} noValidate className="py-6 pr-10 pl-6">
 			<DialogHeader>
 				<DialogTitle>Add Product</DialogTitle>
 				<DialogDescription>
@@ -39,8 +36,16 @@ export const AddProduct = () => {
 					<Label htmlFor="name-1" className="mb-1">
 						Name
 					</Label>
-					<Input ref={nameRef} id="name-1" name="name" />
-					{renderFieldError(validationErrors.name)}
+					<Input
+						ref={nameRef}
+						id="name-1"
+						name="name"
+						aria-invalid={!!validationErrors.name}
+						aria-required="true"
+						aria-describedby={validationErrors.name ? 'name-error' : undefined}
+						onBlur={() => validateField('name')}
+					/>
+					{renderFieldError(validationErrors.name, 'name')}
 				</div>
 
 				<div className="grid">
@@ -98,8 +103,14 @@ export const AddProduct = () => {
 						type="number"
 						step={0.01}
 						min={0}
+						aria-invalid={!!validationErrors.price}
+						aria-required="true"
+						aria-describedby={
+							validationErrors.price ? 'price-error' : undefined
+						}
+						onBlur={() => validateField('price')}
 					/>
-					{renderFieldError(validationErrors.price)}
+					{renderFieldError(validationErrors.price, 'price')}
 				</div>
 			</div>
 
@@ -107,13 +118,8 @@ export const AddProduct = () => {
 				<DialogClose asChild>
 					<Button variant="outline">Cancel</Button>
 				</DialogClose>
-				<Button
-					disabled={
-						validationErrors && Object.keys(validationErrors).length > 0
-					}
-					type="submit"
-				>
-					Save
+				<Button type="submit" disabled={isSubmitting}>
+					{isSubmitting ? 'Adding...' : 'Add Product'}
 				</Button>
 			</DialogFooter>
 		</form>

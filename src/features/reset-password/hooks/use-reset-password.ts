@@ -9,7 +9,7 @@ import {
 } from '@/types';
 import { validateSchema } from '@/utils/validation';
 import { resetPasswordSchema } from '@/utils/validation/schemas';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const useResetPassword = () => {
@@ -18,34 +18,54 @@ export const useResetPassword = () => {
 	const newPasswordRef = useRef<HTMLInputElement>(null);
 	const confirmPasswordRef = useRef<HTMLInputElement>(null);
 	const [passwordVisibility, setPasswordVisibility] = useState(false);
+
 	const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
 		{}
 	);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [, setError] = useState<ApiError | null>(null);
 	const navigate = useNavigate();
 
+	const getFormValues = useCallback(
+		(): ResetConfPasswordPayload => ({
+			password: newPasswordRef.current?.value.trim() || '',
+			password_confirm: confirmPasswordRef.current?.value.trim() || '',
+			resetToken,
+		}),
+		[resetToken]
+	);
+
 	const validate = useCallback((): boolean => {
-		const formInputValues = {
-			password: newPasswordRef.current?.value.trim(),
-			password_confirm: confirmPasswordRef.current?.value.trim(),
-		};
+		const formInputValues = getFormValues();
 		const errors: ValidationErrors = validateSchema(
 			formInputValues,
 			resetPasswordSchema
 		);
 		setValidationErrors(errors);
 		return Object.keys(errors).length === 0;
-	}, []);
+	}, [getFormValues]);
+
+	const validateField = useCallback(
+		(name: keyof ResetConfPasswordPayload) => {
+			const values = getFormValues();
+			const errors = validateSchema(values, resetPasswordSchema);
+			setValidationErrors((prev) => ({
+				...prev,
+				[name]: errors[name],
+			}));
+		},
+		[getFormValues]
+	);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		const data: ResetConfPasswordPayload = {
-			password: newPasswordRef.current?.value.trim() || '',
-			password_confirm: confirmPasswordRef.current?.value.trim() || '',
-			resetToken,
-		};
+		const data = getFormValues();
 		if (!validate()) return;
+
+		setIsSubmitting(true);
 		const response = await authAction.resetConfPassword(data);
+		setIsSubmitting(false);
+
 		if (isApiError(response)) {
 			setError(response);
 		} else {
@@ -53,7 +73,7 @@ export const useResetPassword = () => {
 		}
 	};
 
-	const title = `Change Password | ${APP_NAME}`;
+	const title = useMemo(() => `Change Password | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {
@@ -61,8 +81,9 @@ export const useResetPassword = () => {
 		resetToken,
 		passwordVisibility,
 		setPasswordVisibility,
-		validate,
+		validateField,
 		validationErrors,
 		handleSubmit,
+		isSubmitting,
 	};
 };

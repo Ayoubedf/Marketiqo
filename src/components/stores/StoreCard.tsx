@@ -23,7 +23,7 @@ const StoreCard = ({ store }: { store: Store }) => {
 			</figure>
 			<div className="flex flex-auto flex-col gap-2 p-6">
 				<Link
-					to={`${APP_ROUTES.STORES}/${store._id}`}
+					to={APP_ROUTES.STORE_DETAILS(store._id)}
 					className="text-gray-700 decoration-inherit"
 				>
 					<h2 className="flex items-center gap-2 text-xl font-semibold">

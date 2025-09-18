@@ -10,7 +10,7 @@ export const Profile = (props: ProfileProps) => {
 	const {
 		refs: { emailRef, fileInputRef, nameRef },
 		handleSubmit,
-		validate,
+		validateField,
 		validationErrors,
 		previewUrl,
 		user,
@@ -21,12 +21,13 @@ export const Profile = (props: ProfileProps) => {
 		setDate,
 		startDate,
 		endDate,
+		isSubmitting,
 	} = props;
 
 	return (
 		<form
 			onSubmit={handleSubmit}
-			onChange={validate}
+			noValidate
 			className="space-y-5"
 			encType="multipart/form-data"
 		>
@@ -77,8 +78,12 @@ export const Profile = (props: ProfileProps) => {
 					autoComplete="name"
 					defaultValue={user?.name}
 					placeholder="John Doe"
+					aria-invalid={!!validationErrors.name}
+					aria-required="true"
+					aria-describedby={validationErrors.name ? 'name-error' : undefined}
+					onBlur={() => validateField('name')}
 				/>
-				{renderFieldError(validationErrors.name)}
+				{renderFieldError(validationErrors.name, 'name')}
 			</div>
 
 			<div>
@@ -92,8 +97,12 @@ export const Profile = (props: ProfileProps) => {
 					id="email"
 					name="email"
 					placeholder="john@doe.com"
+					aria-invalid={!!validationErrors.email}
+					aria-required="true"
+					aria-describedby={validationErrors.email ? 'email-error' : undefined}
+					onBlur={() => validateField('email')}
 				/>
-				{renderFieldError(validationErrors.email)}
+				{renderFieldError(validationErrors.email, 'email')}
 			</div>
 
 			<div>
@@ -106,16 +115,21 @@ export const Profile = (props: ProfileProps) => {
 					setDate={setDate}
 					startDate={startDate}
 					endDate={endDate}
+					aria-invalid={!!validationErrors.birthDate}
+					aria-required="true"
+					aria-describedby={
+						validationErrors.birthDate ? 'birthdate-error' : undefined
+					}
 				/>
-				{renderFieldError(validationErrors.birthDate)}
+				{renderFieldError(validationErrors.birthDate, 'birthdate')}
 			</div>
 
 			<Button
 				type="submit"
-				disabled={validationErrors && Object.keys(validationErrors).length > 0}
+				disabled={isSubmitting}
 				className="w-full bg-blue-700 hover:bg-blue-600"
 			>
-				Save Changes
+				{isSubmitting ? 'Saving...' : 'Save Changes'}
 			</Button>
 		</form>
 	);

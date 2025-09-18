@@ -5,3 +5,8 @@ export const humanize = (str: string): string => {
 		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
 		.join(' ');
 };
+
+export const slugify = (str: string): string => {
+	if (!str) return str;
+	return str.toLowerCase().replace(/\s+/g, '-');
+};

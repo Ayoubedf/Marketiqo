@@ -11,7 +11,7 @@ import {
 import { validateSchema } from '@/utils/validation';
 import { emailRegex } from '@/utils/validation/constants';
 import { loginSchema } from '@/utils/validation/schemas';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 export const useLogin = () => {
@@ -24,23 +24,38 @@ export const useLogin = () => {
 	);
 	const [, setError] = useState<ApiError | null>(null);
 	const [passwordVisibility, setPasswordVisibility] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
 	const authAction = useAuthActions();
 	const navigate = useNavigate();
 	const location = useLocation();
 	const from = location.state?.from?.pathname || APP_ROUTES.HOME;
 
-	const validate = useCallback((): boolean => {
-		const formInputValues = {
+	const getFormValues = useCallback(
+		(): LoginFormValues => ({
 			email: emailRef.current?.value.toLowerCase().trim() || '',
 			password: passwordRef.current?.value.trim() || '',
-		};
-		const errors: ValidationErrors = validateSchema(
-			formInputValues,
-			loginSchema
-		);
+		}),
+		[]
+	);
+
+	const validate = useCallback((values: LoginFormValues): boolean => {
+		const errors = validateSchema(values, loginSchema);
 		setValidationErrors(errors);
 		return Object.keys(errors).length === 0;
 	}, []);
+
+	const validateField = useCallback(
+		(name: keyof LoginFormValues) => {
+			const values = getFormValues();
+			const errors = validateSchema(values, loginSchema);
+			setValidationErrors((prev) => ({
+				...prev,
+				[name]: errors[name],
+			}));
+		},
+		[getFormValues]
+	);
 
 	const resetForm = () => {
 		if (emailRef.current) emailRef.current.value = '';
@@ -56,7 +71,8 @@ export const useLogin = () => {
 			password: passwordRef.current?.value || '',
 		};
 		e.preventDefault();
-		if (!validate()) {
+		const values = getFormValues();
+		if (!validate(values)) {
 			notify.error('Validation Error', {
 				description: 'Please fix the errors in the form.',
 				requiresInternet: false,
@@ -64,6 +80,7 @@ export const useLogin = () => {
 			return;
 		}
 
+		setIsSubmitting(true);
 		const response = await authAction.login(data);
 		if (isApiError(response)) {
 			if (response.code === 'REQUEST_CANCELLED') return;
@@ -72,17 +89,16 @@ export const useLogin = () => {
 			resetForm();
 			navigate(from, { replace: true });
 		}
+		setIsSubmitting(false);
 	};
 
 	const handleForgotPassword = async (
 		e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
 	) => {
 		e.preventDefault();
-		if (!emailRegex.test(emailRef.current?.value.trim() || '')) {
-			setValidationErrors({
-				email:
-					'Password must contain at least 8 characters, one letter, one number, and one special character',
-			});
+		const email = emailRef.current?.value.trim() || '';
+		if (!emailRegex.test(email)) {
+			setValidationErrors({ email: 'Invalid email address.' });
 			return;
 		}
 		const response = await authAction.resetPassword({
@@ -95,7 +111,7 @@ export const useLogin = () => {
 		}
 	};
 
-	const title = `Login | ${APP_NAME}`;
+	const title = useMemo(() => `Login | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {
@@ -103,9 +119,10 @@ export const useLogin = () => {
 		validationErrors,
 		passwordVisibility,
 		setPasswordVisibility,
-		validate,
+		validateField,
 		resetForm,
 		handleSubmit,
 		handleForgotPassword,
+		isSubmitting,
 	};
 };

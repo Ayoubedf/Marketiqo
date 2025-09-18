@@ -13,29 +13,50 @@ export const useStoreManager = (defaultCategories: Category[]) => {
 	const [categories, setCategories] = useState<Category[]>(
 		() => defaultCategories
 	);
-	const isMounted = useRef(false);
+	const categoriesUpdated = useRef(false);
 	const [validationErrors, setValidationErrors] =
 		useState<StoreValidationErrors>({});
+	const [isSubmitting] = useState(false);
+
+	interface StoreDetailsFormValues {
+		name: string;
+		description: string;
+		categories: Category[];
+	}
+
+	const getFormValues = useCallback(
+		(): StoreDetailsFormValues => ({
+			name: nameRef.current?.value.trim() || '',
+			description: descRef.current?.value.trim() || '',
+			categories,
+		}),
+		[categories]
+	);
 
 	const validate = useCallback((): boolean => {
-		const formInputValues = {
-			name: nameRef.current?.value.trim() || '',
-			categories,
-		};
-		if (!isMounted.current) isMounted.current = true;
+		const formInputValues = getFormValues();
 		const errors: StoreValidationErrors = validateSchema(
 			formInputValues,
 			manageStoreSchema
 		);
 		setValidationErrors(errors);
 		return Object.keys(errors).length === 0;
-	}, [categories]);
+	}, [getFormValues]);
 
-	useEffect(() => {
-		if (isMounted.current) validate();
-	}, [categories.length, validate]);
+	const validateField = useCallback(
+		(name: keyof StoreDetailsFormValues) => {
+			const values = getFormValues();
+			const errors = validateSchema(values, manageStoreSchema);
+			setValidationErrors((prev) => ({
+				...prev,
+				[name]: errors[name],
+			}));
+		},
+		[getFormValues]
+	);
 
 	const handleChange = (category: Category) => {
+		if (!categoriesUpdated.current) categoriesUpdated.current = true;
 		setCategories((prev) =>
 			prev.includes(category)
 				? prev.filter((cat) => cat !== category)
@@ -79,13 +100,18 @@ export const useStoreManager = (defaultCategories: Category[]) => {
 		}
 	};
 
+	useEffect(() => {
+		if (categoriesUpdated.current) validateField('categories');
+	}, [categories.length, validateField]);
+
 	return {
 		refs: { nameRef, descRef },
 		categories,
-		validate,
+		validateField,
 		validationErrors,
 		handleChange,
 		handleSubmit,
 		logo,
+		isSubmitting,
 	};
 };

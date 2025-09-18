@@ -46,6 +46,9 @@ export default function ProfileMenu() {
 		navigate(APP_ROUTES.LOGIN, { replace: true });
 	};
 
+	const storeId =
+		typeof user.store === 'string' ? user.store : (user.store?._id ?? '');
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -91,11 +94,7 @@ export default function ProfileMenu() {
 
 							{state.user.role === 'merchant' && (
 								<DropdownMenuItem
-									onClick={() =>
-										navigate(
-											`${APP_ROUTES.STORES}/${user.store?._id || user.store}`
-										)
-									}
+									onClick={() => navigate(APP_ROUTES.STORE_DETAILS(storeId))}
 								>
 									<StoreIcon
 										size={16}

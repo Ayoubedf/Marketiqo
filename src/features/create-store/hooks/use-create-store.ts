@@ -4,10 +4,18 @@ import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useImageUpload } from '@/hooks/use-image-upload';
 import * as storeService from '@/services/storeService';
 import { notify } from '@/lib/notify';
-import { Category, isApiError, StoreValidationErrors } from '@/types';
+import {
+	Category,
+	isApiError,
+	ManageStoreFormValues,
+	StoreValidationErrors,
+} from '@/types';
 import { validateSchema } from '@/utils/validation';
-import { createStoreSchema } from '@/utils/validation/schemas';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+	createStoreSchema,
+	manageStoreSchema,
+} from '@/utils/validation/schemas';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function useCreateStore() {
@@ -26,6 +34,7 @@ export default function useCreateStore() {
 	const categoriesUpdated = useRef(false);
 	const [validationErrors, setValidationErrors] =
 		useState<StoreValidationErrors>({});
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const axiosPrivate = useAxiosPrivate();
 	const createStore = useCallback(
@@ -35,18 +44,36 @@ export default function useCreateStore() {
 	const navigate = useNavigate();
 	const MAX_FILE_SIZE_MB = 5;
 
-	const validate = useCallback((): boolean => {
-		const formInputValues = {
+	const getFormValues = useCallback(
+		(): ManageStoreFormValues => ({
 			name: nameRef.current?.value.trim() || '',
+			description: descRef.current?.value.trim() || '',
 			categories,
-		};
+		}),
+		[categories]
+	);
+
+	const validate = useCallback((): boolean => {
+		const formInputValues = getFormValues();
 		const errors: StoreValidationErrors = validateSchema(
 			formInputValues,
 			createStoreSchema
 		);
 		setValidationErrors(errors);
 		return Object.keys(errors).length === 0;
-	}, [categories]);
+	}, [getFormValues]);
+
+	const validateField = useCallback(
+		(name: keyof ManageStoreFormValues) => {
+			const values = getFormValues();
+			const errors = validateSchema(values, manageStoreSchema);
+			setValidationErrors((prev) => ({
+				...prev,
+				[name]: errors[name],
+			}));
+		},
+		[getFormValues]
+	);
 
 	const resetForm = () => {
 		if (nameRef.current) nameRef.current.value = '';
@@ -85,7 +112,10 @@ export default function useCreateStore() {
 			return;
 		}
 
+		setIsSubmitting(true);
 		const response = await createStore(formData);
+		setIsSubmitting(false);
+
 		if (!isApiError(response)) {
 			dispatch({ type: 'UPDATE_USER', payload: { role: 'merchant' } });
 			resetForm();
@@ -103,15 +133,15 @@ export default function useCreateStore() {
 	};
 
 	useEffect(() => {
-		if (categoriesUpdated.current) validate();
-	}, [categories.length, validate]);
+		if (categoriesUpdated.current) validateField('categories');
+	}, [categories.length, validateField]);
 
-	const title = `Create Store | ${APP_NAME}`;
+	const title = useMemo(() => `Create Store | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {
 		refs: { fileInputRef, nameRef, descRef },
-		validate,
+		validateField,
 		validationErrors,
 		resetForm,
 		handleSubmit,
@@ -121,5 +151,6 @@ export default function useCreateStore() {
 		handleFileChange,
 		fileName,
 		categories,
+		isSubmitting,
 	};
 }

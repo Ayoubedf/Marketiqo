@@ -1,3 +1,4 @@
+import { humanize } from '@/features/category/utils/format';
 import { Category, categoryList } from '@/types';
 
 interface CategoryCheckboxProps {
@@ -23,7 +24,6 @@ function CategoryCheckbox({
 			<label className="relative flex items-center">
 				<input
 					id={checkboxId}
-					autoComplete="name"
 					type="checkbox"
 					checked={isChecked}
 					onChange={() => handleChange(category)}
@@ -47,7 +47,7 @@ function CategoryCheckbox({
 				</span>
 			</label>
 			<label htmlFor={checkboxId} className="cursor-pointer text-sm capitalize">
-				{category}
+				{humanize(category)}
 			</label>
 		</div>
 	);

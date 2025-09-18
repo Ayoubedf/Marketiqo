@@ -21,6 +21,7 @@ export const OTPCard = () => {
 		isResending,
 		isResent,
 		cooldown,
+		isSubmitting,
 	} = useResetOtp();
 
 	if (!email) return <Navigate to={APP_ROUTES.HOME} replace />;
@@ -34,7 +35,7 @@ export const OTPCard = () => {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<OTPReset otpRef={otpRef} handleSubmit={handleSubmit} />
+				<OTPReset otpRef={otpRef} handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
 			</CardContent>
 			<CardFooter>
 				<OTPResend

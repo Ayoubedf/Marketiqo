@@ -92,11 +92,14 @@ export const categoryList = [
 	'cosmetics',
 	'electronics',
 	'apparels',
-	'home appliances',
+	'home-appliances',
 	'furnitures',
 	'books',
 ] as const;
 export type Category = (typeof categoryList)[number];
+export const isCategory = (str: string): str is Category => {
+	return categoryList.includes(str as Category);
+};
 
 export interface ErrorResponse {
 	status?: number;

@@ -1,5 +1,5 @@
 import { Category } from '@/types';
-import { humanize } from '../utils/humanize';
+import { humanize } from '../utils/format';
 
 interface ProductsHeaderProps {
 	category: Category | null;

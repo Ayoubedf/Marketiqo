@@ -1,3 +1,4 @@
+import { APP_NAME } from '@/config/constants';
 import { motion } from 'framer-motion';
 
 export const StoresListHeader = () => {
@@ -17,8 +18,8 @@ export const StoresListHeader = () => {
 				transition={{ delay: 0.3 }}
 				className="mx-auto max-w-xl text-gray-500"
 			>
-				Explore unique brands and businesses built on Marketiqo. Click any store
-				to browse their products and learn more.
+				Explore unique brands and businesses built on {APP_NAME}. Click any
+				store to browse their products and learn more.
 			</motion.p>
 		</div>
 	);

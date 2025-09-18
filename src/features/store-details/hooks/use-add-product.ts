@@ -1,6 +1,10 @@
 import { useImageUpload } from '@/hooks/use-image-upload';
 import { notify } from '@/lib/notify';
-import { ProductValidationErrors, StoreValidationErrors } from '@/types';
+import {
+	AddProductFormValues,
+	ProductValidationErrors,
+	StoreValidationErrors,
+} from '@/types';
 import { validateSchema } from '@/utils/validation';
 import { addProductSchema } from '@/utils/validation/schemas';
 import { AxiosError } from 'axios';
@@ -13,19 +17,38 @@ export const useAddProduct = () => {
 	const priceRef = useRef<HTMLInputElement>(null);
 	const [validationErrors, setValidationErrors] =
 		useState<ProductValidationErrors>({});
+	const [isSubmitting] = useState(false);
 
-	const validate = useCallback((): boolean => {
-		const formInputValues = {
+	const getFormValues = useCallback(
+		(): AddProductFormValues => ({
 			name: nameRef.current?.value.trim() || '',
 			price: parseFloat(priceRef.current?.value ?? '0'),
-		};
+			description: descRef.current?.value.trim() || '',
+		}),
+		[]
+	);
+
+	const validate = useCallback((): boolean => {
+		const formInputValues = getFormValues();
 		const errors: StoreValidationErrors = validateSchema(
 			formInputValues,
 			addProductSchema
 		);
 		setValidationErrors(errors);
 		return Object.keys(errors).length === 0;
-	}, []);
+	}, [getFormValues]);
+
+	const validateField = useCallback(
+		(name: keyof AddProductFormValues) => {
+			const values = getFormValues();
+			const errors = validateSchema(values, addProductSchema);
+			setValidationErrors((prev) => ({
+				...prev,
+				[name]: errors[name],
+			}));
+		},
+		[getFormValues]
+	);
 
 	const resetForm = () => {
 		if (nameRef.current) nameRef.current.value = '';
@@ -38,12 +61,13 @@ export const useAddProduct = () => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setValidationErrors({});
+		const values = getFormValues();
 		const file = preview.fileInputRef.current?.files?.[0];
 		const formData = new FormData();
-		formData.append('name', nameRef.current?.value as string);
-		formData.append('description', descRef.current?.value as string);
+		formData.append('name', values.name);
+		formData.append('description', values.description);
 		if (file) formData.append('preview', file);
-		formData.append('price', priceRef.current?.value as string);
+		formData.append('price', values.price.toString());
 
 		if (!validate()) {
 			notify.error('Validation Error', {
@@ -73,9 +97,10 @@ export const useAddProduct = () => {
 	return {
 		refs: { nameRef, descRef, priceRef },
 		preview,
-		validate,
+		validateField,
 		validationErrors,
 		handleSubmit,
 		resetForm,
+		isSubmitting,
 	};
 };
