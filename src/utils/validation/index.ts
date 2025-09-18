@@ -15,7 +15,7 @@ import {
 	validateRequired,
 } from './validators';
 
-export function validateSchema<T extends Record<string, unknown>>(
+export function validateSchema<T extends object>(
 	values: Partial<T>,
 	schema: ValidationSchema<T>
 ): ValidationErrors<T> {
@@ -36,7 +36,12 @@ export function validateSchema<T extends Record<string, unknown>>(
 			() => validateEmail(value, label, rules.email),
 			() => validatePassword(value, label, rules.password),
 			() =>
-				validateConfirmed(value, label, rules.confirmed, values['password']),
+				validateConfirmed(
+					value,
+					label,
+					rules.confirmed,
+					(values as Partial<Record<'password', unknown>>).password
+				),
 			() => validateMinLength(value, label, rules.minLength),
 			() => validateMaxLength(value, label, rules.maxLength),
 			() => validateNumber(value, label, rules.number),

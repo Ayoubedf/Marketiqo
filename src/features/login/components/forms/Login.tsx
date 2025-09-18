@@ -10,16 +10,17 @@ import { useLogin } from '../../hooks/use-login';
 export const Login = () => {
 	const {
 		refs: { emailRef, passwordRef, rememberRef },
-		validate,
 		validationErrors,
+		validateField,
 		handleSubmit,
 		handleForgotPassword,
 		passwordVisibility,
 		setPasswordVisibility,
+		isSubmitting,
 	} = useLogin();
 
 	return (
-		<form onSubmit={handleSubmit} onChange={validate} className="space-y-6">
+		<form onSubmit={handleSubmit} noValidate className="space-y-6">
 			<div>
 				<label htmlFor="email" className="block text-sm/6 font-medium">
 					Email address
@@ -32,10 +33,15 @@ export const Login = () => {
 						type="email"
 						placeholder="john@doe.com"
 						autoComplete="email"
-						aria-invalid={validationErrors.email != null}
+						aria-invalid={!!validationErrors.email}
+						aria-required="true"
+						aria-describedby={
+							validationErrors.email ? 'email-error' : undefined
+						}
+						onBlur={() => validateField('email')}
 					/>
 				</div>
-				{renderFieldError(validationErrors.email)}
+				{renderFieldError(validationErrors.email, 'email')}
 			</div>
 
 			<div>
@@ -50,20 +56,26 @@ export const Login = () => {
 						type={passwordVisibility ? 'text' : 'password'}
 						placeholder="secret1234@"
 						autoComplete="current-password"
-						aria-invalid={validationErrors.password != null}
+						aria-invalid={!!validationErrors.password}
+						aria-required="true"
+						aria-describedby={
+							validationErrors.password ? 'password-error' : undefined
+						}
+						onBlur={() => validateField('password')}
 					/>
 					<button
 						type="button"
+						onClick={() => setPasswordVisibility(!passwordVisibility)}
 						aria-label={passwordVisibility ? 'Hide password' : 'Show password'}
 						className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center justify-around rounded-md p-1 transition-colors hover:bg-gray-200/50"
 					>
 						<UseAnimations
 							animation={visibility}
-							onClick={() => setPasswordVisibility(!passwordVisibility)}
+							reverse={passwordVisibility}
 						/>
 					</button>
 				</div>
-				{renderFieldError(validationErrors.password)}
+				{renderFieldError(validationErrors.password, 'password')}
 			</div>
 
 			<div className="flex justify-between">
@@ -106,10 +118,10 @@ export const Login = () => {
 			</div>
 			<Button
 				type="submit"
-				disabled={validationErrors && Object.keys(validationErrors).length > 0}
+				disabled={isSubmitting}
 				className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
 			>
-				Sign in
+				{isSubmitting ? 'Signing in…' : 'Sign in'}
 			</Button>
 		</form>
 	);

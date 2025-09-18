@@ -33,6 +33,7 @@ import { Category } from '@/types';
 import UserProfileMenu from './ProfileMenu';
 import AppContext from '@/contexts/AppProvider';
 import { useDebouncedResize } from '@/hooks/use-debounced-resize';
+import { humanize } from '@/features/category/utils/format';
 
 interface CategoryElement {
 	icon: JSX.Element;
@@ -46,7 +47,7 @@ const categories: CategoryElement[] = [
 	{ icon: <SparklesIcon className="size-4" />, label: 'cosmetics' },
 	{ icon: <CpuIcon className="size-4" />, label: 'electronics' },
 	{ icon: <ShirtIcon className="size-4" />, label: 'apparels' },
-	{ icon: <HomeIcon className="size-4" />, label: 'home appliances' },
+	{ icon: <HomeIcon className="size-4" />, label: 'home-appliances' },
 	{ icon: <ArmchairIcon className="size-4" />, label: 'furnitures' },
 	{ icon: <BookOpenIcon className="size-4" />, label: 'books' },
 ];
@@ -85,14 +86,12 @@ const NavItems = ({ isOpen }: NavItemsProps) => {
 					<DropdownMenuContent>
 						{categories.map((category, index) => (
 							<DropdownMenuItem
-								onClick={() =>
-									navigate(`/category/${category.label.replace(/\s+/g, '-')}`)
-								}
+								onClick={() => navigate(APP_ROUTES.CATEGORY(category.label))}
 								key={index}
 								className="flex cursor-pointer items-center space-x-2"
 							>
 								{category.icon}
-								<span className="capitalize">{category.label}</span>
+								<span>{humanize(category.label)}</span>
 							</DropdownMenuItem>
 						))}
 					</DropdownMenuContent>
@@ -165,7 +164,7 @@ const Header = () => {
 		const formData = new FormData(e.target as HTMLFormElement);
 		const query = formData.get('q')?.toString().trim().slice(0, 100) || '';
 		const safeQuery = encodeURIComponent(query);
-		navigate(`/collections/${safeQuery}`);
+		navigate(APP_ROUTES.COLLECTIONS(safeQuery));
 	};
 
 	return (
@@ -335,4 +334,3 @@ const Header = () => {
 };
 
 export default Header;
-

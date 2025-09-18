@@ -13,16 +13,17 @@ export const ResetPassword = () => {
 		refs: { newPasswordRef, confirmPasswordRef },
 		resetToken,
 		handleSubmit,
-		validate,
+		validateField,
 		validationErrors,
 		passwordVisibility,
 		setPasswordVisibility,
+		isSubmitting,
 	} = useResetPassword();
 
 	if (!resetToken) return <Navigate to={APP_ROUTES.HOME} replace />;
 
 	return (
-		<form onSubmit={handleSubmit} onChange={validate}>
+		<form onSubmit={handleSubmit} noValidate>
 			<div className="flex flex-col gap-6">
 				<div className="grid gap-2">
 					<Label htmlFor="new-password">New Password</Label>
@@ -33,13 +34,16 @@ export const ResetPassword = () => {
 							type={passwordVisibility ? 'text' : 'password'}
 							placeholder="secret1234@"
 							autoComplete="new-password"
+							aria-invalid={!!validationErrors.password}
+							aria-required="true"
 							aria-describedby={
-								validationErrors.password ? 'new-password-error' : ''
+								validationErrors.password ? 'password-error' : undefined
 							}
-							required
+							onBlur={() => validateField('password')}
 						/>
 						<button
 							type="button"
+							onClick={() => setPasswordVisibility(!passwordVisibility)}
 							aria-label={
 								passwordVisibility ? 'Hide password' : 'Show password'
 							}
@@ -47,11 +51,11 @@ export const ResetPassword = () => {
 						>
 							<UseAnimations
 								animation={visibility}
-								onClick={() => setPasswordVisibility(!passwordVisibility)}
+								reverse={passwordVisibility}
 							/>
 						</button>
 					</div>
-					{renderFieldError(validationErrors.password)}
+					{renderFieldError(validationErrors.password, 'password')}
 				</div>
 				<div className="grid gap-2">
 					<Label htmlFor="confirm-password">Confirm Password</Label>
@@ -61,15 +65,23 @@ export const ResetPassword = () => {
 						type="password"
 						placeholder="secret1234@"
 						autoComplete="confirm-password"
+						aria-invalid={!!validationErrors.password_confirm}
+						aria-required="true"
 						aria-describedby={
-							validationErrors.password_confirm ? 'confirm-password-error' : ''
+							validationErrors.password_confirm
+								? 'confirm-password-error'
+								: undefined
 						}
+						onBlur={() => validateField('password_confirm')}
 						required
 					/>
-					{renderFieldError(validationErrors.password_confirm)}
+					{renderFieldError(
+						validationErrors.password_confirm,
+						'password-confirm'
+					)}
 				</div>
-				<Button type="submit" className="w-full">
-					Change Password
+				<Button type="submit" disabled={isSubmitting} className="w-full">
+					{isSubmitting ? 'Updating...' : 'Update Password'}
 				</Button>
 			</div>
 		</form>

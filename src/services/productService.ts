@@ -33,7 +33,7 @@ export async function getProductsByCategory(
 ) {
 	return apiRequest<Product[]>(
 		{
-			url: `${API_ENDPOINTS.PRODUCTS}/${category}`,
+			url: API_ENDPOINTS.PRODUCT_CATEGORY(category),
 			method: 'GET',
 			signal: controller?.signal,
 		},

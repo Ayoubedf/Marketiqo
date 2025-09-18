@@ -11,9 +11,14 @@ import { FormEvent, RefObject } from 'react';
 interface OTPResetProps {
 	otpRef: RefObject<HTMLInputElement | null>;
 	handleSubmit: (e: FormEvent) => Promise<void>;
+	isSubmitting: boolean;
 }
 
-export const OTPReset = ({ otpRef, handleSubmit }: OTPResetProps) => {
+export const OTPReset = ({
+	otpRef,
+	handleSubmit,
+	isSubmitting,
+}: OTPResetProps) => {
 	return (
 		<form id="otp-form" onSubmit={handleSubmit}>
 			<div className="flex items-center justify-center gap-3">
@@ -32,8 +37,8 @@ export const OTPReset = ({ otpRef, handleSubmit }: OTPResetProps) => {
 				</div>
 			</div>
 			<div className="mx-auto mt-4 max-w-[260px]">
-				<Button type="submit" className="w-full">
-					Next
+				<Button type="submit" disabled={isSubmitting} className="w-full">
+					{isSubmitting ? 'Verifying...' : 'Next'}
 				</Button>
 			</div>
 		</form>

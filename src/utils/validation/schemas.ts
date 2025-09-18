@@ -14,12 +14,10 @@ export const loginSchema: ValidationSchema<LoginFormValues> = {
 	email: {
 		required: true,
 		email: true,
-		fieldName: 'Email',
 	},
 	password: {
 		required: true,
 		password: true,
-		fieldName: 'Password',
 	},
 };
 
@@ -27,20 +25,17 @@ export const fogotPasswordSchema: ValidationSchema<ForgotPasswordFormValues> = {
 	email: {
 		required: true,
 		email: true,
-		fieldName: 'Email',
 	},
 };
 
-export const editProfileSchema: ValidationSchema<Partial<User>> = {
+export const profileSchema: ValidationSchema<Partial<User>> = {
 	name: {
 		required: true,
 		minLength: 2,
-		fieldName: 'Name',
 	},
 	email: {
 		required: true,
 		email: true,
-		fieldName: 'Email',
 	},
 	birthDate: {
 		required: true,
@@ -52,12 +47,10 @@ export const editProfileSchema: ValidationSchema<Partial<User>> = {
 export const addProductSchema: ValidationSchema<Partial<AddProductFormValues>> =
 	{
 		name: {
-			fieldName: 'Name',
 			required: true,
 			minLength: 2,
 		},
 		price: {
-			fieldName: 'Price',
 			number: true,
 			min: 0,
 		},
@@ -67,7 +60,6 @@ export const manageStoreSchema: ValidationSchema<
 	Partial<ManageStoreFormValues>
 > = {
 	name: {
-		fieldName: 'Name',
 		required: true,
 		minLength: 2,
 	},
@@ -81,7 +73,6 @@ export const createStoreSchema: ValidationSchema<
 	Partial<ManageStoreFormValues>
 > = {
 	name: {
-		fieldName: 'Name',
 		required: true,
 		minLength: 2,
 	},
@@ -95,16 +86,13 @@ export const registerSchema: ValidationSchema<Partial<RegisterFormValues>> = {
 	email: {
 		required: true,
 		email: true,
-		fieldName: 'Email',
 	},
 	password: {
 		required: true,
 		password: true,
-		fieldName: 'Password',
 	},
 	password_confirm: {
 		confirmed: true,
-		fieldName: 'Password Confirm',
 	},
 	birthDate: {
 		date: true,
@@ -121,11 +109,9 @@ export const resetPasswordSchema: ValidationSchema<
 	password: {
 		required: true,
 		password: true,
-		fieldName: 'Password',
 	},
 	password_confirm: {
 		confirmed: true,
-		fieldName: 'Password Confirm',
 	},
 };
 
@@ -135,14 +121,14 @@ export const changePasswordSchema: ValidationSchema<
 	current_password: {
 		required: true,
 		password: true,
-		fieldName: 'Current password',
+		fieldName: 'current password',
 	},
 	password: {
 		password: true,
-		fieldName: 'New Password',
+		fieldName: 'new password',
 	},
 	password_confirm: {
-		fieldName: 'Password Confirm',
+		fieldName: 'password confirm',
 		confirmed: true,
 	},
 };

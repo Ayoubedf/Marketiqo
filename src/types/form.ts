@@ -23,6 +23,12 @@ export interface RegisterFormValues {
 	conditions: boolean;
 }
 
+export interface ProfileFormValues {
+	name: string;
+	email: string;
+	birthDate: Date | undefined;
+}
+
 export interface AddProductFormValues {
 	name: string;
 	description: string;

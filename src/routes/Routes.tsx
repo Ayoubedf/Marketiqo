@@ -15,31 +15,38 @@ import CreateStore from '@/pages/CreateStore';
 import StoresList from '@/pages/StoresList';
 import StoreDetails from '@/pages/StoreDetails';
 import CompleteProfile from '@/pages/CompleteProfile';
+import { APP_ROUTES } from '@/config/constants';
 
 const AppRoutes = () => {
 	return (
 		<Routes>
-			<Route path="/" element={<Layout />}>
-				<Route path="login" element={<Login />} />
-				<Route path="register" element={<Register />} />
+			<Route path={APP_ROUTES.HOME} element={<Layout />}>
+				<Route path={APP_ROUTES.LOGIN} element={<Login />} />
+				<Route path={APP_ROUTES.REGISTER} element={<Register />} />
 				<Route
-					path="onboarding/complete-profile"
+					path={APP_ROUTES.COMPLETE_PROFILE}
 					element={<CompleteProfile />}
 				/>
-				<Route path="password/reset" element={<OTPReset />} />
-				<Route path="password/change" element={<ResetPassword />} />ù
+				<Route path={APP_ROUTES.PASS_RESET} element={<OTPReset />} />
+				<Route path={APP_ROUTES.PASS_CHANGE} element={<ResetPassword />} />
 				<Route element={<RequireAuth />}>
 					<Route index element={<Home />} />
-					<Route path="category/:cat" element={<Category />} />
-					<Route path="collections/:q?" element={<Collections />} />
-					<Route path="stores" element={<StoresList />} />
-					<Route path="stores/:id" element={<StoreDetails />} />
-					<Route path="profile" element={<Profile />} />
-					<Route path="settings" element={<Settings />} />
-					<Route path="stores/create" element={<CreateStore />} />
+					<Route path={APP_ROUTES.CATEGORY(':cat')} element={<Category />} />
+					<Route
+						path={APP_ROUTES.COLLECTIONS(':q?')}
+						element={<Collections />}
+					/>
+					<Route path={APP_ROUTES.STORES} element={<StoresList />} />
+					<Route
+						path={APP_ROUTES.STORE_DETAILS(':id')}
+						element={<StoreDetails />}
+					/>
+					<Route path={APP_ROUTES.PROFILE} element={<Profile />} />
+					<Route path={APP_ROUTES.SETTINGS} element={<Settings />} />
+					<Route path={APP_ROUTES.CREATE_STORE} element={<CreateStore />} />
 				</Route>
 			</Route>
-			<Route path="*" element={<NotFound />} />
+			<Route path={APP_ROUTES.NOT_FOUND} element={<NotFound />} />
 		</Routes>
 	);
 };

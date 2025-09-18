@@ -3,11 +3,11 @@ import { useAuthActions } from '@/features/auth';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useImageUpload } from '@/hooks/use-image-upload';
 import { notify } from '@/lib/notify';
-import { isApiError } from '@/types';
+import { isApiError, ProfileFormValues } from '@/types';
 import { validateSchema } from '@/utils/validation';
-import { editProfileSchema } from '@/utils/validation/schemas';
+import { profileSchema } from '@/utils/validation/schemas';
 import { jwtDecode } from 'jwt-decode';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface ValidationErrors {
@@ -50,6 +50,7 @@ const useProfile = () => {
 		? new Date(tempUser.birthDate)
 		: new Date();
 	const [date, setDate] = useState<Date | undefined>(DefaultDate);
+
 	const {
 		previewUrl,
 		fileInputRef,
@@ -61,28 +62,47 @@ const useProfile = () => {
 	const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
 		{}
 	);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
 	const navigate = useNavigate();
 	const startDate = new Date(new Date().getFullYear() - 50, 0);
 	const endDate = new Date();
 	const MAX_FILE_SIZE_MB = 5;
 
-	const validate = useCallback((): boolean => {
-		const formInputValues = {
+	const getFormValues = useCallback(
+		(): ProfileFormValues => ({
+			email: emailRef.current?.value.toLowerCase().trim() || '',
 			name: nameRef.current?.value.trim() || '',
-			email: emailRef.current?.value.trim() || '',
 			birthDate: date,
-		};
+		}),
+		[date]
+	);
+
+	const validate = useCallback((): boolean => {
+		const formInputValues = getFormValues();
 		const errors: ValidationErrors = validateSchema(
 			formInputValues,
-			editProfileSchema
+			profileSchema
 		);
 		setValidationErrors(errors);
 		return Object.keys(errors).length === 0;
-	}, [date]);
+	}, [getFormValues]);
+
+	const validateField = useCallback(
+		(name: keyof ProfileFormValues) => {
+			const values = getFormValues();
+			const errors = validateSchema(values, profileSchema);
+			setValidationErrors((prev) => ({
+				...prev,
+				[name]: errors[name],
+			}));
+		},
+		[getFormValues]
+	);
 
 	useEffect(() => {
-		if (date) validate();
-	}, [date, validate]);
+		if (date) validateField('birthDate');
+	}, [date, validateField]);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -112,7 +132,9 @@ const useProfile = () => {
 			}
 		}
 
+		setIsSubmitting(true);
 		const response = await authAction.completeProfile(formData);
+		setIsSubmitting(false);
 
 		if (!isApiError(response)) {
 			navigate(APP_ROUTES.LOGIN, {
@@ -121,7 +143,7 @@ const useProfile = () => {
 		}
 	};
 
-	const title = `Complete Profile | ${APP_NAME}`;
+	const title = useMemo(() => `Complete Profile | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {
@@ -136,9 +158,10 @@ const useProfile = () => {
 		handleFileChange,
 		fileName,
 		handleRemove,
-		validate,
+		validateField,
 		validationErrors,
 		handleSubmit,
+		isSubmitting,
 	};
 };
 

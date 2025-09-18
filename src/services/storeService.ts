@@ -41,7 +41,7 @@ export async function getStore(
 ) {
 	return apiRequest<Store>(
 		{
-			url: `${API_ENDPOINTS.STORE}/${id}`,
+			url: API_ENDPOINTS.STORE_DETAILS(id),
 			method: 'GET',
 			signal: controller?.signal,
 		},

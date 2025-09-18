@@ -21,9 +21,10 @@ interface ManageStoreProps {
 export const ManageStore = ({ store }: ManageStoreProps) => {
 	const {
 		refs: { nameRef, descRef },
-		validate,
+		validateField,
 		validationErrors,
 		handleSubmit,
+		isSubmitting,
 		logo,
 		handleChange,
 		categories,
@@ -31,11 +32,7 @@ export const ManageStore = ({ store }: ManageStoreProps) => {
 
 	const storeLogo = logo.previewUrl || store.logo;
 	return (
-		<form
-			onChange={validate}
-			onSubmit={handleSubmit}
-			className="py-6 pr-10 pl-6"
-		>
+		<form onSubmit={handleSubmit} noValidate className="py-6 pr-10 pl-6">
 			<DialogHeader>
 				<DialogTitle>Manage Store</DialogTitle>
 				<DialogDescription>
@@ -54,8 +51,12 @@ export const ManageStore = ({ store }: ManageStoreProps) => {
 						name="name"
 						defaultValue={store.name}
 						ref={nameRef}
+						aria-invalid={!!validationErrors.name}
+						aria-required="true"
+						aria-describedby={validationErrors.name ? 'name-error' : undefined}
+						onBlur={() => validateField('name')}
 					/>
-					{renderFieldError(validationErrors.name)}
+					{renderFieldError(validationErrors.name, 'name')}
 				</div>
 				<div className="grid">
 					<Label htmlFor="description-2" className="mb-1">
@@ -100,28 +101,33 @@ export const ManageStore = ({ store }: ManageStoreProps) => {
 						aria-label="Upload image file"
 					/>
 				</div>
-				<div className="grid">
-					<Label className="mb-2">Categories</Label>
-					<div className="mb-4 grid grid-cols-2 gap-y-3 sm:grid-cols-3 md:grid-cols-4">
-						<CategoryCheckboxes
-							categories={categories}
-							handleChange={handleChange}
-						/>
+				<fieldset
+					aria-invalid={!!validationErrors.categories}
+					aria-required="true"
+					aria-describedby={
+						validationErrors.categories ? 'categories-error' : undefined
+					}
+				>
+					<legend className="mb-1 block items-center gap-2 text-sm leading-none font-medium">
+						Categories
+					</legend>
+					<div className="mt-4">
+						<div className="mb-4 grid grid-cols-2 gap-y-3 sm:grid-cols-3 md:grid-cols-4">
+							<CategoryCheckboxes
+								categories={categories}
+								handleChange={handleChange}
+							/>
+						</div>
+						{renderFieldError(validationErrors.categories, 'categories')}
 					</div>
-					{renderFieldError(validationErrors.categories)}
-				</div>
+				</fieldset>
 			</div>
 			<DialogFooter>
 				<DialogClose asChild>
 					<Button variant="outline">Cancel</Button>
 				</DialogClose>
-				<Button
-					disabled={
-						validationErrors && Object.keys(validationErrors).length > 0
-					}
-					type="submit"
-				>
-					Save
+				<Button disabled={isSubmitting} type="submit">
+					{isSubmitting ? 'Saving...' : 'Save Changes'}
 				</Button>
 			</DialogFooter>
 		</form>

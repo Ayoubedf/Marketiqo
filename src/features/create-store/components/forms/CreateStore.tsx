@@ -15,15 +15,16 @@ export const CreateStore = () => {
 		handleThumbnailClick,
 		previewUrl,
 		refs: { descRef, fileInputRef, nameRef },
-		validate,
+		validateField,
 		validationErrors,
 		categories,
+		isSubmitting,
 	} = useCreateStore();
 
 	return (
 		<motion.form
-			onChange={validate}
 			onSubmit={handleSubmit}
+			noValidate
 			initial={{ opacity: 0, y: 40 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -42,8 +43,12 @@ export const CreateStore = () => {
 					name="name"
 					type="name"
 					autoComplete="name"
+					aria-invalid={!!validationErrors.name}
+					aria-required="true"
+					aria-describedby={validationErrors.name ? 'name-error' : undefined}
+					onBlur={() => validateField('name')}
 				/>
-				{renderFieldError(validationErrors.name)}
+				{renderFieldError(validationErrors.name, 'name')}
 			</div>
 
 			<div>
@@ -95,27 +100,33 @@ export const CreateStore = () => {
 					aria-label="Upload image file"
 				/>
 			</div>
-			<div className="space-y-2">
-				<label className="block text-sm font-medium text-gray-700">
+			<fieldset
+				aria-invalid={!!validationErrors.categories}
+				aria-required="true"
+				aria-describedby={
+					validationErrors.categories ? 'categories-error' : undefined
+				}
+			>
+				<legend className="block text-sm font-medium text-gray-700">
 					Categories
-				</label>
-				<div className="mt-4 mb-8">
+				</legend>
+				<div className="mt-4">
 					<div className="mb-4 grid grid-cols-2 gap-y-3 sm:grid-cols-3 md:grid-cols-4">
 						<CategoryCheckboxes
 							categories={categories}
 							handleChange={handleChange}
 						/>
 					</div>
-					{renderFieldError(validationErrors.categories)}
+					{renderFieldError(validationErrors.categories, 'categories')}
 				</div>
-			</div>
+			</fieldset>
 
 			<Button
 				type="submit"
-				disabled={validationErrors && Object.keys(validationErrors).length > 0}
+				disabled={isSubmitting}
 				className="w-full bg-blue-700 hover:bg-blue-600"
 			>
-				Create Store
+				{isSubmitting ? 'Creating...' : 'Create Store'}
 			</Button>
 		</motion.form>
 	);

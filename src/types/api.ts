@@ -90,7 +90,7 @@ export interface Product {
 }
 
 export interface Store {
-	_id: number;
+	_id: string;
 	name: string;
 	description: string;
 	logo: string;

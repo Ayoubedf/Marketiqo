@@ -1,3 +1,4 @@
+import { APP_NAME } from '@/config/constants';
 import { motion } from 'framer-motion';
 
 export const CreateStoreHeader = () => {
@@ -9,7 +10,7 @@ export const CreateStoreHeader = () => {
 				transition={{ duration: 0.5 }}
 				className="mb-4 text-4xl font-extrabold"
 			>
-				Create Your Store with Marketiqo
+				Create Your Store with {APP_NAME}
 			</motion.h1>
 			<motion.p
 				initial={{ opacity: 0 }}

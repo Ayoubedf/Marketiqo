@@ -2,7 +2,7 @@ import { APP_NAME, APP_ROUTES } from '@/config/constants';
 import { useAuthActions } from '@/features/auth';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { isApiError } from '@/types';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 export const useResetOtp = () => {
@@ -13,13 +13,18 @@ export const useResetOtp = () => {
 	const navigate = useNavigate();
 	const [isResending, setIsResending] = useState(false);
 	const [isResent, setIsResent] = useState<boolean | null>(null);
-	const [resendCount, setResendCount] = useState<number>(0);
-	const [cooldown, setCooldown] = useState<number>(0);
+	const [resendCount, setResendCount] = useState(0);
+	const [cooldown, setCooldown] = useState(0);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const otp = otpRef.current?.value || '';
+
+		setIsSubmitting(true);
 		const response = await authAction.verifyOTP({ email, otp });
+		setIsSubmitting(false);
+
 		if (!isApiError(response)) {
 			navigate(APP_ROUTES.PASS_CHANGE, { replace: true });
 		}
@@ -53,7 +58,7 @@ export const useResetOtp = () => {
 		setIsResending(false);
 	};
 
-	const title = `Verify OTP | ${APP_NAME}`;
+	const title = useMemo(() => `Verify OTP | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {
@@ -65,5 +70,6 @@ export const useResetOtp = () => {
 		cooldown,
 		handleSubmit,
 		handleResend,
+		isSubmitting,
 	};
 };

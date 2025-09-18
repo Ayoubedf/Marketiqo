@@ -1,7 +1,7 @@
 import { ArrowRightIcon, ShoppingCartIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { APP_ROUTES } from '@/config/constants';
+import { APP_NAME, APP_ROUTES } from '@/config/constants';
 import { motion } from 'framer-motion';
 
 export const HeroBanner = () => {
@@ -16,14 +16,14 @@ export const HeroBanner = () => {
 				>
 					<Link
 						to={APP_ROUTES.NEW}
-						aria-label="See what's new in Marketiqo"
+						aria-label={`See what's new in ${APP_NAME}`}
 						className="mb-7 inline-flex items-center justify-between rounded-full bg-gradient-to-l from-gray-100 to-gray-200 px-1 py-1 pr-4 text-sm text-gray-700 hover:bg-gray-200 hover:to-gray-100 dark:from-gray-700 dark:to-gray-800 dark:text-white dark:hover:to-gray-700"
 					>
 						<span className="mr-3 rounded-full bg-blue-600 px-4 py-1.5 text-xs text-white">
 							New
 						</span>
 						<span className="text-sm font-medium">
-							Marketiqo is out! See what&apos;s new
+							{APP_NAME} is out! See what&apos;s new
 						</span>
 						<ArrowRightIcon className="ml-2 h-5 w-5 opacity-70" />
 					</Link>
@@ -36,7 +36,7 @@ export const HeroBanner = () => {
 					transition={{ duration: 0.6 }}
 					className="mb-4 text-4xl leading-tight font-extrabold tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
 				>
-					Unlock Your Business Potential with Marketiqo
+					Unlock Your Business Potential with {APP_NAME}
 				</motion.h1>
 
 				{/* Subtitle */}
@@ -69,7 +69,7 @@ export const HeroBanner = () => {
 						</Link>
 					</Button>
 					<Button variant="outline" className="h-auto text-gray-700" asChild>
-						<Link to={APP_ROUTES.COLLECTIONS}>
+						<Link to={APP_ROUTES.COLLECTIONS('')}>
 							<ShoppingCartIcon height={20} className="mr-3" />
 							Shop Now
 						</Link>

@@ -1,14 +1,12 @@
 import { Button } from '@/components/ui/button';
-import env from '@/config/env';
-import { API_ENDPOINTS } from '@/config/constants';
-import { Link } from 'react-router-dom';
+import { API_ENDPOINTS, apiUrl } from '@/config/constants';
 
 export const ThirdParties = () => {
 	return (
 		<div className="mt-6 grid grid-cols-2 gap-4">
 			<Button variant="outline" asChild>
-				<Link
-					to={`${env.VITE_API_BASE_URL}${API_ENDPOINTS.LOGIN_GOOGLE}`}
+				<a
+					href={apiUrl(API_ENDPOINTS.LOGIN_GOOGLE)}
 					className="flex w-full justify-center gap-3 rounded-md bg-white px-3 py-2 text-center text-sm font-semibold text-gray-900 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-800/50"
 				>
 					<svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
@@ -30,11 +28,11 @@ export const ThirdParties = () => {
 						/>
 					</svg>
 					<span className="text-sm font-semibold">Google</span>
-				</Link>
+				</a>
 			</Button>
 			<Button variant="outline" asChild>
-				<Link
-					to={`${env.VITE_API_BASE_URL}${API_ENDPOINTS.LOGIN_GITHUB}`}
+				<a
+					href={apiUrl(API_ENDPOINTS.LOGIN_GITHUB)}
 					className="flex w-full justify-center gap-3 rounded-md bg-white px-3 py-2 text-center text-sm font-semibold text-gray-900 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-800/50"
 				>
 					<svg
@@ -50,7 +48,7 @@ export const ThirdParties = () => {
 						/>
 					</svg>
 					<span className="text-sm font-semibold">GitHub</span>
-				</Link>
+				</a>
 			</Button>
 		</div>
 	);

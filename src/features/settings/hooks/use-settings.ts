@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useAuthActions } from '@/features/auth';
 import { PasswordChangePayload } from '@/types';
 import { validateSchema } from '@/utils/validation';
@@ -25,29 +25,42 @@ export function useSettings() {
 	const [currentPasswordVisibility, setCurrentPasswordVisibility] =
 		useState(false);
 	const [newPasswordVisibility, setNewPasswordVisibility] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const getFormValues = useCallback(
+		(): PasswordChangePayload => ({
+			current_password: currentPasswordRef.current?.value.trim() || '',
+			password: newPasswordRef.current?.value.trim() || '',
+			password_confirm: confirmPasswordRef.current?.value.trim() || '',
+		}),
+		[]
+	);
 
 	const validate = useCallback((): boolean => {
-		const formInputValues = {
-			current_password: currentPasswordRef.current?.value.trim() as string,
-			password: newPasswordRef.current?.value.trim() as string,
-			password_confirm: confirmPasswordRef.current?.value.trim() as string,
-		};
+		const formInputValues = getFormValues();
 		const errors: ValidationErrors = validateSchema(
 			formInputValues,
 			changePasswordSchema
 		);
 		setValidationErrors(errors);
 		return Object.keys(errors).length === 0;
-	}, []);
+	}, [getFormValues]);
+
+	const validateField = useCallback(
+		(name: keyof PasswordChangePayload) => {
+			const values = getFormValues();
+			const errors = validateSchema(values, changePasswordSchema);
+			setValidationErrors((prev) => ({
+				...prev,
+				[name]: errors[name],
+			}));
+		},
+		[getFormValues]
+	);
 
 	const handlePasswordUpdate = async (e: React.FormEvent) => {
 		e.preventDefault();
-
-		const data: PasswordChangePayload = {
-			current_password: currentPasswordRef.current?.value.trim() as string,
-			password: newPasswordRef.current?.value.trim() as string,
-			password_confirm: confirmPasswordRef.current?.value.trim() as string,
-		};
+		const data = getFormValues();
 
 		if (!validate()) {
 			notify.error('Validation Error', {
@@ -57,10 +70,12 @@ export function useSettings() {
 			return;
 		}
 
+		setIsSubmitting(true);
 		await updatePassword(data);
+		setIsSubmitting(false);
 	};
 
-	const title = `Settings | ${APP_NAME}`;
+	const title = useMemo(() => `Settings | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {
@@ -74,7 +89,8 @@ export function useSettings() {
 		newPasswordVisibility,
 		setCurrentPasswordVisibility,
 		setNewPasswordVisibility,
-		validate,
+		validateField,
 		handlePasswordUpdate,
+		isSubmitting,
 	};
 }

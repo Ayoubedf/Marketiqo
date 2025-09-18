@@ -1,3 +1,4 @@
+import { capitalize } from '../capitalize';
 import { emailRegex, passwordRegex } from './constants';
 import { extractRule } from './extractRules';
 
@@ -11,7 +12,7 @@ export function validateRequired(
 		required &&
 		(value === undefined || value === null || value === '' || value === false)
 	) {
-		return message ?? `${label} is required.`;
+		return message ?? `${capitalize(label)} is required.`;
 	}
 }
 
@@ -70,7 +71,9 @@ export function validateMinLength(
 ) {
 	const { value: min, message } = extractRule(rule);
 	if (min && typeof value === 'string' && value.length < min) {
-		return message ?? `${label} must be at least ${min} characters.`;
+		return (
+			message ?? `${capitalize(label)} must be at least ${min} characters.`
+		);
 	}
 	if (min && Array.isArray(value) && value.length < min) {
 		return message ?? `You must select at least ${min} ${label}.`;
@@ -84,7 +87,7 @@ export function validateMaxLength(
 ) {
 	const { value: max, message } = extractRule(rule);
 	if (max && typeof value === 'string' && value.length > max) {
-		return message ?? `${label} must be at most ${max} characters.`;
+		return message ?? `${capitalize(label)} must be at most ${max} characters.`;
 	}
 	if (max && Array.isArray(value) && value.length > max) {
 		return message ?? `You must select at most ${max} ${label}.`;
@@ -99,7 +102,7 @@ export function validateNumber(
 	const { value: numberRule, message } = extractRule(rule);
 	const numValue = Number(value);
 	if (numberRule && (value === '' || isNaN(numValue))) {
-		return message ?? `${label} is invalid.`;
+		return message ?? `${capitalize(label)} is invalid.`;
 	}
 }
 
@@ -111,7 +114,7 @@ export function validateMin(
 	const { value: min, message } = extractRule(rule);
 	const numValue = Number(value);
 	if (min !== undefined && numValue < min) {
-		return message ?? `${label} must be at least ${min}.`;
+		return message ?? `${capitalize(label)} must be at least ${min}.`;
 	}
 }
 
@@ -123,7 +126,7 @@ export function validateMax(
 	const { value: max, message } = extractRule(rule);
 	const numValue = Number(value);
 	if (max !== undefined && numValue > max) {
-		return message ?? `${label} must be at most ${max}.`;
+		return message ?? `${capitalize(label)} must be at most ${max}.`;
 	}
 }
 
@@ -134,7 +137,7 @@ export function validateDate(
 ) {
 	const { value: date, message } = extractRule(rule);
 	if (date && !(value instanceof Date)) {
-		return message ?? `${label} is not a valid date.`;
+		return message ?? `${capitalize(label)} is not a valid date.`;
 	}
 }
 
@@ -159,6 +162,6 @@ export function validateChecked(
 ) {
 	const { value: checked, message } = extractRule(rule);
 	if (checked && value !== true) {
-		return message ?? `${label} must be accepted.`;
+		return message ?? `${capitalize(label)} must be accepted.`;
 	}
 }

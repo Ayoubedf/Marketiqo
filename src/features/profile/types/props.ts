@@ -1,4 +1,4 @@
-import { User, ValidationErrors } from '@/types';
+import { ProfileFormValues, User, ValidationErrors } from '@/types';
 import {
 	ChangeEvent,
 	Dispatch,
@@ -14,7 +14,7 @@ export interface ProfileProps {
 		nameRef: RefObject<HTMLInputElement | null>;
 	};
 	handleSubmit: (e: FormEvent) => Promise<void>;
-	validate: () => void;
+	validateField: (name: keyof ProfileFormValues) => void;
 	validationErrors: ValidationErrors;
 	previewUrl: string | null;
 	user: User | null;
@@ -26,4 +26,5 @@ export interface ProfileProps {
 	setDate: Dispatch<SetStateAction<Date | undefined>>;
 	startDate: Date;
 	endDate: Date;
+	isSubmitting: boolean;
 }
