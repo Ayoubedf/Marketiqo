@@ -7,7 +7,7 @@ import { notify } from '@/lib/notify';
 import { Category, isApiError, StoreValidationErrors } from '@/types';
 import { validateSchema } from '@/utils/validation';
 import { createStoreSchema } from '@/utils/validation/schemas';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function useCreateStore() {
@@ -106,7 +106,7 @@ export default function useCreateStore() {
 		if (categoriesUpdated.current) validate();
 	}, [categories.length, validate]);
 
-	const title = `Create Store | ${APP_NAME}`;
+	const title = useMemo(() => `Create Store | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {

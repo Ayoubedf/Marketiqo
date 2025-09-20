@@ -7,7 +7,7 @@ import { isApiError } from '@/types';
 import { validateSchema } from '@/utils/validation';
 import { editProfileSchema } from '@/utils/validation/schemas';
 import { jwtDecode } from 'jwt-decode';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface ValidationErrors {
@@ -101,6 +101,7 @@ const useProfile = () => {
 		formData.append('name', nameRef.current?.value as string);
 		formData.append('email', emailRef.current?.value as string);
 		formData.append('birthDate', (date || new Date()).toISOString());
+		formData.append('token', token);
 		if (file) {
 			formData.append('avatar', file);
 			if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
@@ -121,7 +122,7 @@ const useProfile = () => {
 		}
 	};
 
-	const title = `Complete Profile | ${APP_NAME}`;
+	const title = useMemo(() => `Complete Profile | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {

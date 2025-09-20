@@ -1,5 +1,5 @@
 import { AxiosError, isCancel } from 'axios';
-import { Category, User } from './auth';
+import { User } from './auth';
 import { SentMessageInfo } from 'nodemailer';
 
 export type Token = string | null;
@@ -87,6 +87,19 @@ export interface Product {
 		rate: number;
 		count: number;
 	};
+}
+
+export const categoryList = [
+	'cosmetics',
+	'electronics',
+	'apparels',
+	'home-appliances',
+	'furnitures',
+	'books',
+] as const;
+export type Category = (typeof categoryList)[number];
+export function isCategory(value: string): value is Category {
+	return categoryList.includes(value as Category);
 }
 
 export interface Store {

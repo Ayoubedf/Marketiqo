@@ -1,3 +1,4 @@
+import { humanize, slugify } from '@/features/category/utils/format';
 import { Category, categoryList } from '@/types';
 
 interface CategoryCheckboxProps {
@@ -46,8 +47,8 @@ function CategoryCheckbox({
 					</svg>
 				</span>
 			</label>
-			<label htmlFor={checkboxId} className="cursor-pointer text-sm capitalize">
-				{category}
+			<label htmlFor={checkboxId} className="cursor-pointer text-sm">
+				{humanize(category)}
 			</label>
 		</div>
 	);
@@ -58,7 +59,7 @@ export function CategoryCheckboxes({
 	handleChange,
 }: CategoryCheckboxesProps) {
 	return categoryList.map((category) => {
-		const checkboxId = `checkbox-${category.replace(/\s+/g, '-')}`;
+		const checkboxId = `checkbox-${slugify(category)}`;
 		const isChecked = categories.includes(category);
 
 		return (

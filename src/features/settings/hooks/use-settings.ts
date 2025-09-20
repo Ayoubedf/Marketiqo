@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useAuthActions } from '@/features/auth';
 import { PasswordChangePayload } from '@/types';
 import { validateSchema } from '@/utils/validation';
@@ -60,7 +60,7 @@ export function useSettings() {
 		await updatePassword(data);
 	};
 
-	const title = `Settings | ${APP_NAME}`;
+	const title = useMemo(() => `Settings | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {

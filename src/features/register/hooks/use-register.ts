@@ -5,7 +5,13 @@ import { notify } from '@/lib/notify';
 import { isApiError, RegisterRequestPayload, ValidationErrors } from '@/types';
 import { validateSchema } from '@/utils/validation';
 import { registerSchema } from '@/utils/validation/schemas';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const useRegister = () => {
@@ -75,7 +81,7 @@ export const useRegister = () => {
 		}
 	};
 
-	const title = `Register | ${APP_NAME}`;
+	const title = useMemo(() => `Register | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {

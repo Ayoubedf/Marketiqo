@@ -5,7 +5,7 @@ import { useImageUpload } from '@/hooks/use-image-upload';
 import { notify } from '@/lib/notify';
 import { validateSchema } from '@/utils/validation';
 import { editProfileSchema } from '@/utils/validation/schemas';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface ValidationErrors {
 	name?: string;
@@ -85,7 +85,7 @@ const useProfile = () => {
 		await updateProfile(formData);
 	};
 
-	const title = `Edit Profile | ${APP_NAME}`;
+	const title = useMemo(() => `Edit Profile | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {

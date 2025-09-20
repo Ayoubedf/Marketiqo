@@ -3,7 +3,7 @@ import { useAxiosPrivate } from '@/features/auth';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import * as productService from '@/services/productService';
 import { ApiError, isApiError, Product, searchProductsParams } from '@/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 type Params = {
@@ -40,7 +40,7 @@ export default function useCollection() {
 		return () => controller.abort();
 	}, [query, searchProducts]);
 
-	const title = `Collections | ${APP_NAME}`;
+	const title = useMemo(() => `Collections | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {

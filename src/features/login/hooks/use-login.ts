@@ -11,7 +11,7 @@ import {
 import { validateSchema } from '@/utils/validation';
 import { emailRegex } from '@/utils/validation/constants';
 import { loginSchema } from '@/utils/validation/schemas';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 export const useLogin = () => {
@@ -95,7 +95,7 @@ export const useLogin = () => {
 		}
 	};
 
-	const title = `Login | ${APP_NAME}`;
+	const title = useMemo(() => `Login | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {

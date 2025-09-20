@@ -2,9 +2,11 @@ import { APP_NAME } from '@/config/constants';
 import { useAxiosPrivate } from '@/features/auth';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import * as productService from '@/services/productService';
-import { ApiError, Category, isApiError, Product } from '@/types';
-import { useCallback, useEffect, useState } from 'react';
+import { ApiError, Category, isApiError, isCategory, Product } from '@/types';
+import { capitalize } from '@/utils/capitalize';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { slugify } from '../utils/format';
 
 export function useCategory() {
 	const [products, setProducts] = useState<Product[] | null>(null);
@@ -12,9 +14,8 @@ export function useCategory() {
 	const [error, setError] = useState<ApiError | null>(null);
 	const axiosPrivate = useAxiosPrivate();
 	const { cat } = useParams<{ cat?: string }>();
-	const category: Category | null = cat
-		? (cat.replace('_', ' ') as Category)
-		: null;
+	const category: Category | null =
+		cat && isCategory(cat) ? slugify(cat) : null;
 
 	const getProductsByCategory = useCallback(
 		(category: Category, controller?: AbortController) =>
@@ -44,7 +45,10 @@ export function useCategory() {
 		return () => controller.abort();
 	}, [category, fetchProducts, getProductsByCategory]);
 
-	const title = `${category && category?.charAt(0).toUpperCase() + category?.slice(1)} | ${APP_NAME}`;
+	const title = useMemo(
+		() => `${category && capitalize(category)} | ${APP_NAME}`,
+		[category]
+	);
 	useDocumentTitle(title);
 
 	return {

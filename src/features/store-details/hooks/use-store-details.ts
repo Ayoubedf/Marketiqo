@@ -3,7 +3,7 @@ import { useAxiosPrivate } from '@/features/auth';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import * as storeService from '@/services/storeService';
 import { ApiError, isApiError, Store } from '@/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 export const useStoreDetails = () => {
@@ -41,7 +41,10 @@ export const useStoreDetails = () => {
 		};
 	}, [getStore, id]);
 
-	const title = `${store?.name ?? 'Store'} | ${APP_NAME}`;
+	const title = useMemo(
+		() => `${store?.name ?? 'Store'} | ${APP_NAME}`,
+		[store?.name]
+	);
 	useDocumentTitle(title);
 
 	return {

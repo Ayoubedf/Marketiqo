@@ -4,10 +4,11 @@ import { ArrowLeftIcon, HomeIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useMemo } from 'react';
 
 export default function NotFound() {
 	const navigate = useNavigate();
-	const title = `404 Error - Page Missing | ${APP_NAME}`;
+	const title = useMemo(() => `404 Error - Page Missing | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return (

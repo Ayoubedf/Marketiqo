@@ -2,7 +2,7 @@ import { APP_NAME, APP_ROUTES } from '@/config/constants';
 import { useAuthActions } from '@/features/auth';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { isApiError } from '@/types';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 export const useResetOtp = () => {
@@ -53,7 +53,7 @@ export const useResetOtp = () => {
 		setIsResending(false);
 	};
 
-	const title = `Verify OTP | ${APP_NAME}`;
+	const title = useMemo(() => `Verify OTP | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {

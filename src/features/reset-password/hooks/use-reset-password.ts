@@ -9,7 +9,7 @@ import {
 } from '@/types';
 import { validateSchema } from '@/utils/validation';
 import { resetPasswordSchema } from '@/utils/validation/schemas';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const useResetPassword = () => {
@@ -53,7 +53,7 @@ export const useResetPassword = () => {
 		}
 	};
 
-	const title = `Change Password | ${APP_NAME}`;
+	const title = useMemo(() => `Change Password | ${APP_NAME}`, []);
 	useDocumentTitle(title);
 
 	return {

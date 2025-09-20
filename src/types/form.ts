@@ -1,4 +1,4 @@
-import { Category } from './auth';
+import { Category } from './api';
 
 export interface LoginFormValues {
 	email: string;

@@ -88,16 +88,6 @@ export interface AuthActions {
 	logout: Logout;
 }
 
-export const categoryList = [
-	'cosmetics',
-	'electronics',
-	'apparels',
-	'home appliances',
-	'furnitures',
-	'books',
-] as const;
-export type Category = (typeof categoryList)[number];
-
 export interface ErrorResponse {
 	status?: number;
 	statusText?: string;
