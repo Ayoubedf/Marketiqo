@@ -33,7 +33,7 @@ export const APP_ROUTES = {
 	PASS_RESET: '/password/reset',
 	PASS_CHANGE: '/password/change',
 
-	CATEGORY: (cat: Category | ':cat') => `/category/${cat}`,
+	CATEGORY: (cat: Category | ':cat') => `/category/${slugify(cat)}`,
 	COLLECTIONS: (q?: string) => (q ? `/collections/${q}` : '/collections'),
 	STORES: '/stores',
 	STORE_DETAILS: (id: string) => `/stores/${id}`,
