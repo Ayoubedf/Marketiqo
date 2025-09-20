@@ -14,10 +14,8 @@ export function useCategory() {
 	const [error, setError] = useState<ApiError | null>(null);
 	const axiosPrivate = useAxiosPrivate();
 	const { cat = '' } = useParams<{ cat?: string }>();
-	const urlFriendlyCategory = slugify(cat);
-	const category: Category | null = isCategory(urlFriendlyCategory)
-		? urlFriendlyCategory
-		: null;
+	const category: Category | null =
+		cat && isCategory(cat) ? slugify(cat) : null;
 
 	const getProductsByCategory = useCallback(
 		(category: Category, controller?: AbortController) =>

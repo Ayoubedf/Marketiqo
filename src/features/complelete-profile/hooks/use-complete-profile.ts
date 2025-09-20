@@ -121,6 +121,7 @@ const useProfile = () => {
 		formData.append('name', nameRef.current?.value as string);
 		formData.append('email', emailRef.current?.value as string);
 		formData.append('birthDate', (date || new Date()).toISOString());
+		formData.append('token', token);
 		if (file) {
 			formData.append('avatar', file);
 			if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {

@@ -58,7 +58,7 @@ export function CategoryCheckboxes({
 	handleChange,
 }: CategoryCheckboxesProps) {
 	return categoryList.map((category) => {
-		const checkboxId = `checkbox-${category.replace(/\s+/g, '-')}`;
+		const checkboxId = `checkbox-${category}`;
 		const isChecked = categories.includes(category);
 
 		return (
