@@ -5,7 +5,8 @@ import { slugify } from '@/features/category/utils/format';
 export const API_ENDPOINTS = {
 	USERS: '/users',
 	PRODUCTS: '/products',
-	PRODUCT_CATEGORY: (category: Category) => `/products/${cat === ':cat' ? cat : slugify(cat)}`,
+	PRODUCT_CATEGORY: (cat: Category | ':cat') =>
+		`/products/${cat === ':cat' ? cat : slugify(cat)}`,
 	PRODUCTS_SEARCH: '/products/search',
 	STORE: '/stores',
 	STORE_DETAILS: (id: string) => `/stores/${id}`,
