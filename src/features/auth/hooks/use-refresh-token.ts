@@ -1,5 +1,5 @@
 import axios from '@/services/api';
-import { API_ENDPOINTS } from '@/config/constants';
+import { API_ENDPOINTS } from '@/core/config/constants';
 import { tokenManager, useAuthState } from '@/features/auth';
 import { Refresh } from '@/types';
 

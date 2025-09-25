@@ -1,5 +1,9 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import {
+	Avatar,
+	AvatarFallback,
+	AvatarImage,
+} from '@/shared/components/ui/avatar';
+import { Button } from '@/shared/components/ui/button';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -8,8 +12,8 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { APP_ROUTES } from '@/config/constants';
+} from '@/shared/components/ui/dropdown-menu';
+import { APP_ROUTES } from '@/core/config/constants';
 import { useAuthActions, useAuthState } from '@/features/auth';
 import { AuthContextState, User } from '@/types';
 

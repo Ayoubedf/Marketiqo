@@ -1,8 +1,8 @@
-import { containerVariants } from '@/animations';
+import { containerVariants } from '@/shared/animations';
 import { motion } from 'framer-motion';
-import ErrorMessage from '@/components/common/ErrorMessage';
-import ProductSkeleton from '@/components/products/ProductSkeleton';
-import ProductCard from '@/components/products/ProductCard';
+import ErrorMessage from '@/shared/components/common/ErrorMessage';
+import ProductSkeleton from '@/shared/components/products/ProductSkeleton';
+import ProductCard from '@/shared/components/products/ProductCard';
 import { ApiError, Product } from '@/types';
 
 interface ProductsGridProps {

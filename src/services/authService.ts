@@ -1,5 +1,5 @@
-import { API_ENDPOINTS } from '@/config/constants';
-import { getBase64 } from '@/utils/getBase64';
+import { API_ENDPOINTS } from '@/core/config/constants';
+import { getBase64 } from '@/shared/utils/getBase64';
 import { apiRequest } from '@/services/api';
 import { Axios } from 'axios';
 import {

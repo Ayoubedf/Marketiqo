@@ -1,8 +1,8 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/components/ui/button';
 import { TrashIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { notify } from '@/lib/notify';
-import { itemVariants } from '@/animations';
+import { itemVariants } from '@/shared/animations';
 import { PasswordSection } from '@/features/settings';
 
 const Settings = () => {

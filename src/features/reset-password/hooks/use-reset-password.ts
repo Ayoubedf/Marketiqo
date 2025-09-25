@@ -1,14 +1,14 @@
-import { APP_NAME, APP_ROUTES } from '@/config/constants';
+import { APP_NAME, APP_ROUTES } from '@/core/config/constants';
 import { tokenManager, useAuthActions } from '@/features/auth';
-import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import {
 	ApiError,
 	isApiError,
 	ResetConfPasswordPayload,
 	ValidationErrors,
 } from '@/types';
-import { validateSchema } from '@/utils/validation';
-import { resetPasswordSchema } from '@/utils/validation/schemas';
+import { validateSchema } from '@/shared/utils/validation';
+import { resetPasswordSchema } from '@/shared/utils/validation/schemas';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 

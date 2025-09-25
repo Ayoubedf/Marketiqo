@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from '@/config/constants';
+import { API_ENDPOINTS } from '@/core/config/constants';
 import {
 	getProductsParams,
 	Product,

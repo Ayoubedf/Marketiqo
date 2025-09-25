@@ -5,13 +5,13 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { DateSelector } from '@/components/ui/date-selector';
+import { Button } from '@/shared/components/ui/button';
+import { DateSelector } from '@/shared/components/ui/date-selector';
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@/shared/components/ui/popover';
 
 export function DatePicker({
 	id,

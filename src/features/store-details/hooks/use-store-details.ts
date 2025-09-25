@@ -1,6 +1,6 @@
-import { APP_NAME } from '@/config/constants';
+import { APP_NAME } from '@/core/config/constants';
 import { useAxiosPrivate } from '@/features/auth';
-import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import * as storeService from '@/services/storeService';
 import { ApiError, isApiError, Store } from '@/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';

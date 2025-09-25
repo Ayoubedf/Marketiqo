@@ -1,7 +1,7 @@
 import { ArrowRightIcon, ShoppingCartIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { APP_NAME, APP_ROUTES } from '@/config/constants';
+import { Button } from '@/shared/components/ui/button';
+import { APP_NAME, APP_ROUTES } from '@/core/config/constants';
 import { motion } from 'framer-motion';
 
 export const HeroBanner = () => {
@@ -17,7 +17,7 @@ export const HeroBanner = () => {
 					<Link
 						to={APP_ROUTES.NEW}
 						aria-label={`See what's new in ${APP_NAME}`}
-						className="mb-7 inline-flex items-center justify-between rounded-full bg-gradient-to-l from-gray-100 to-gray-200 px-1 py-1 pr-4 text-sm text-gray-700 hover:bg-gray-200 hover:to-gray-100 dark:from-gray-700 dark:to-gray-800 dark:text-white dark:hover:to-gray-700"
+						className="mb-7 inline-flex items-center justify-between rounded-full bg-gradient-to-l from-gray-100 to-gray-200 px-1 py-1 pr-4 text-sm text-gray-700 shadow backdrop-blur hover:bg-gray-200 hover:to-gray-100 dark:from-gray-700 dark:to-gray-800 dark:text-white dark:hover:to-gray-700"
 					>
 						<span className="mr-3 rounded-full bg-blue-600 px-4 py-1.5 text-xs text-white">
 							New

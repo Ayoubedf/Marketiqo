@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import { API_ENDPOINTS, apiUrl } from '@/config/constants';
+import { Button } from '@/shared/components/ui/button';
+import { API_ENDPOINTS, apiUrl } from '@/core/config/constants';
 
 export const ThirdParties = () => {
 	return (

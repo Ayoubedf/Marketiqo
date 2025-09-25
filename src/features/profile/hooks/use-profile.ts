@@ -1,11 +1,11 @@
-import { APP_NAME } from '@/config/constants';
+import { APP_NAME } from '@/core/config/constants';
 import { useAuthActions, useAuthState } from '@/features/auth';
-import { useDocumentTitle } from '@/hooks/use-document-title';
-import { useImageUpload } from '@/hooks/use-image-upload';
+import { useDocumentTitle } from '@/shared/hooks/use-document-title';
+import { useImageUpload } from '@/shared/hooks/use-image-upload';
 import { notify } from '@/lib/notify';
 import { ProfileFormValues } from '@/types';
-import { validateSchema } from '@/utils/validation';
-import { profileSchema } from '@/utils/validation/schemas';
+import { validateSchema } from '@/shared/utils/validation';
+import { profileSchema } from '@/shared/utils/validation/schemas';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface ValidationErrors {

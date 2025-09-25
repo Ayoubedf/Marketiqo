@@ -1,9 +1,9 @@
-import { Input } from '@/components/ui/input';
+import { Input } from '@/shared/components/ui/input';
 import { useSettings } from '../../hooks/use-settings';
 import UseAnimations from 'react-useanimations';
 import visibility from 'react-useanimations/lib/visibility2';
-import { renderFieldError } from '@/utils/renderFieldError';
-import { Button } from '@/components/ui/button';
+import { renderFieldError } from '@/shared/utils/renderFieldError';
+import { Button } from '@/shared/components/ui/button';
 
 export function PasswordChange() {
 	const {

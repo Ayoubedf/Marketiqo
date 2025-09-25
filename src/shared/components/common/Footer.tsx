@@ -1,4 +1,4 @@
-import { APP_NAME, APP_ROUTES } from '@/config/constants';
+import { APP_NAME, APP_ROUTES } from '@/core/config/constants';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {

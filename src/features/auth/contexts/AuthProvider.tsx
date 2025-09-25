@@ -21,12 +21,12 @@ import {
 	VerifyOTP,
 	isApiError,
 } from '@/types';
-import { withAbortToast } from '@/utils/withAbortToast';
+import { withAbortToast } from '@/shared/utils/withAbortToast';
 import { tokenManager } from '@/features/auth/globals/tokenManager';
 import * as rawService from '@/services/authService';
 import { authReducer } from './authReducer';
 import { useAxiosPrivate } from '@/features/auth/hooks/use-axios-private';
-import { API_ENDPOINTS } from '@/config/constants';
+import { API_ENDPOINTS } from '@/core/config/constants';
 import { AuthActionsContext, AuthStateContext } from './authContexts';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {

@@ -1,18 +1,18 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { renderFieldError } from '@/utils/renderFieldError';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
+import { Label } from '@/shared/components/ui/label';
+import { Textarea } from '@/shared/components/ui/textarea';
+import { renderFieldError } from '@/shared/utils/renderFieldError';
 import {
 	DialogFooter,
 	DialogHeader,
 	DialogClose,
 	DialogDescription,
 	DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/shared/components/ui/dialog';
 import { useStoreManager } from '../../hooks/use-store-manager';
 import { Store } from '@/types';
-import { CategoryCheckboxes } from '@/components/common/CategoryCheckboxes';
+import { CategoryCheckboxes } from '@/shared/components/common/CategoryCheckboxes';
 
 interface ManageStoreProps {
 	store: Store;

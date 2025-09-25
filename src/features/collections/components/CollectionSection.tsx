@@ -1,4 +1,4 @@
-import ProductsGrid from '@/components/products/ProductsGrid';
+import ProductsGrid from '@/shared/components/products/ProductsGrid';
 import ProductsHeader from './ProductsHeader';
 import useCollection from '../hooks/use-collection';
 

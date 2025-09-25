@@ -1,7 +1,7 @@
-import { APP_NAME, APP_ROUTES } from '@/config/constants';
+import { APP_NAME, APP_ROUTES } from '@/core/config/constants';
 import { useAuthState, useAxiosPrivate } from '@/features/auth';
-import { useDocumentTitle } from '@/hooks/use-document-title';
-import { useImageUpload } from '@/hooks/use-image-upload';
+import { useDocumentTitle } from '@/shared/hooks/use-document-title';
+import { useImageUpload } from '@/shared/hooks/use-image-upload';
 import * as storeService from '@/services/storeService';
 import { notify } from '@/lib/notify';
 import {
@@ -10,11 +10,11 @@ import {
 	ManageStoreFormValues,
 	StoreValidationErrors,
 } from '@/types';
-import { validateSchema } from '@/utils/validation';
+import { validateSchema } from '@/shared/utils/validation';
 import {
 	createStoreSchema,
 	manageStoreSchema,
-} from '@/utils/validation/schemas';
+} from '@/shared/utils/validation/schemas';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 

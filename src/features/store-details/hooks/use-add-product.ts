@@ -1,12 +1,12 @@
-import { useImageUpload } from '@/hooks/use-image-upload';
+import { useImageUpload } from '@/shared/hooks/use-image-upload';
 import { notify } from '@/lib/notify';
 import {
 	AddProductFormValues,
 	ProductValidationErrors,
 	StoreValidationErrors,
 } from '@/types';
-import { validateSchema } from '@/utils/validation';
-import { addProductSchema } from '@/utils/validation/schemas';
+import { validateSchema } from '@/shared/utils/validation';
+import { addProductSchema } from '@/shared/utils/validation/schemas';
 import { AxiosError } from 'axios';
 import { useCallback, useRef, useState } from 'react';
 

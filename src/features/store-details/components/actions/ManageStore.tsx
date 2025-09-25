@@ -1,6 +1,10 @@
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/shared/components/ui/button';
+import {
+	Dialog,
+	DialogContent,
+	DialogTrigger,
+} from '@/shared/components/ui/dialog';
+import { ScrollArea } from '@/shared/components/ui/scroll-area';
 import { SettingsIcon } from 'lucide-react';
 import { ManageStore as ManageStoreForm } from '../forms/ManageStore';
 import { Store } from '@/types';

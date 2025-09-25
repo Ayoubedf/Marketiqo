@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import ProductsHeader from './ProductsHeader';
-import ProductsGrid from '@/components/products/ProductsGrid';
+import ProductsGrid from '@/shared/components/products/ProductsGrid';
 
 import { useCategory } from '../hooks/use-category';
 

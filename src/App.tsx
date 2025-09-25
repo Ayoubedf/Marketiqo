@@ -1,8 +1,8 @@
 import { Toaster } from 'sonner';
 import './App.css';
-import AppRoutes from './routes/Routes';
+import AppRoutes from './core/routes/routes';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { AppProvider } from './contexts/AppProvider';
+import { AppProvider } from './core/contexts/AppProvider';
 import { AuthProvider } from './features/auth';
 
 function App() {
@@ -19,4 +19,3 @@ function App() {
 }
 
 export default App;
-
