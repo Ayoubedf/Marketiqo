@@ -1,8 +1,8 @@
-import { useImageUpload } from '@/hooks/use-image-upload';
+import { useImageUpload } from '@/shared/hooks/use-image-upload';
 import { notify } from '@/lib/notify';
 import { Category, StoreValidationErrors } from '@/types';
-import { validateSchema } from '@/utils/validation';
-import { manageStoreSchema } from '@/utils/validation/schemas';
+import { validateSchema } from '@/shared/utils/validation';
+import { manageStoreSchema } from '@/shared/utils/validation/schemas';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
 

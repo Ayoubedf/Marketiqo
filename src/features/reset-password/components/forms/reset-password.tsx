@@ -1,12 +1,12 @@
 import { Navigate } from 'react-router-dom';
 import { useResetPassword } from '../../hooks/use-reset-password';
-import { APP_ROUTES } from '@/config/constants';
-import { Input } from '@/components/ui/input';
+import { APP_ROUTES } from '@/core/config/constants';
+import { Input } from '@/shared/components/ui/input';
 import visibility from 'react-useanimations/lib/visibility2';
 import UseAnimations from 'react-useanimations';
-import { renderFieldError } from '@/utils/renderFieldError';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { renderFieldError } from '@/shared/utils/renderFieldError';
+import { Button } from '@/shared/components/ui/button';
+import { Label } from '@/shared/components/ui/label';
 
 export const ResetPassword = () => {
 	const {

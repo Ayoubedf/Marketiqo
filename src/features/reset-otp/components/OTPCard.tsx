@@ -1,4 +1,4 @@
-import { APP_ROUTES } from '@/config/constants';
+import { APP_ROUTES } from '@/core/config/constants';
 import { Navigate } from 'react-router-dom';
 import { OTPReset } from './forms/OTPReset';
 import {
@@ -8,7 +8,7 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
-} from '@/components/ui/card';
+} from '@/shared/components/ui/card';
 import { OTPResend } from './OTPResend';
 import { useResetOtp } from '../hooks/use-reset-otp';
 
@@ -35,7 +35,11 @@ export const OTPCard = () => {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<OTPReset otpRef={otpRef} handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
+				<OTPReset
+					otpRef={otpRef}
+					handleSubmit={handleSubmit}
+					isSubmitting={isSubmitting}
+				/>
 			</CardContent>
 			<CardFooter>
 				<OTPResend

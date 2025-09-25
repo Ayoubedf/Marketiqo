@@ -1,4 +1,8 @@
-import { CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from '@/shared/components/ui/card';
 
 interface ProfileHeaderProps {
 	title: string;

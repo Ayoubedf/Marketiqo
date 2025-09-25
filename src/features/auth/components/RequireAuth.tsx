@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthState } from '@/features/auth/contexts/authContexts';
-import Spinner from '../../../components/ui/spinner';
+import Spinner from '@/shared/components/ui/spinner';
 
 export const RequireAuth = () => {
 	const { isAuthenticated, loading } = useAuthState();
@@ -8,7 +8,11 @@ export const RequireAuth = () => {
 
 	if (loading)
 		return (
-			<div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80">
+			<div
+				className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80"
+				role="status"
+				aria-live="polite"
+			>
 				<Spinner size="medium">
 					<span className="mt-5 text-xs">Loading your account…</span>
 				</Spinner>

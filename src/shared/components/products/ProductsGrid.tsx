@@ -1,7 +1,7 @@
-import ErrorMessage from '@/components/common/ErrorMessage';
-import ProductCard from '@/components/products/ProductCard';
-import ProductSkeleton from '@/components/products/ProductSkeleton';
-import { containerVariants } from '@/animations';
+import ErrorMessage from '@/shared/components/common/ErrorMessage';
+import ProductCard from '@/shared/components/products/ProductCard';
+import ProductSkeleton from '@/shared/components/products/ProductSkeleton';
+import { containerVariants } from '@/shared/animations';
 import { ApiError, Product } from '@/types';
 import { motion } from 'framer-motion';
 

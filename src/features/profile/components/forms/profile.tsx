@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { DatePicker } from '@/components/ui/date-picker';
-import { Input } from '@/components/ui/input';
-import { renderFieldError } from '@/utils/renderFieldError';
+import { Button } from '@/shared/components/ui/button';
+import { DatePicker } from '@/shared/components/ui/date-picker';
+import { Input } from '@/shared/components/ui/input';
+import { renderFieldError } from '@/shared/utils/renderFieldError';
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { motion } from 'framer-motion';
 import { ProfileProps } from '../../types';

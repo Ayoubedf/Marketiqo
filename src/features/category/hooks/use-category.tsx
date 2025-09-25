@@ -1,12 +1,12 @@
-import { APP_NAME } from '@/config/constants';
+import { APP_NAME } from '@/core/config/constants';
 import { useAxiosPrivate } from '@/features/auth';
-import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import * as productService from '@/services/productService';
 import { ApiError, Category, isApiError, isCategory, Product } from '@/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { slugify } from '../utils/format';
-import { capitalize } from '@/utils/capitalize';
+import { capitalize } from '@/shared/utils/capitalize';
 
 export function useCategory() {
 	const [products, setProducts] = useState<Product[] | null>(null);

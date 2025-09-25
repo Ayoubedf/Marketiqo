@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from '@/config/constants';
+import { API_ENDPOINTS } from '@/core/config/constants';
 import { Store } from '@/types';
 import { Axios } from 'axios';
 import { apiRequest } from './api';

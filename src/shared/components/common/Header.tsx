@@ -5,9 +5,9 @@ import {
 	DropdownMenuTrigger,
 	DropdownMenuContent,
 	DropdownMenuItem,
-} from '@shadcn/dropdown-menu';
-import { Button } from '@shadcn/button';
-import { Input } from '@shadcn/input';
+} from '@/shared/components/ui/dropdown-menu';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
 import {
 	Drawer,
 	DrawerContent,
@@ -16,7 +16,7 @@ import {
 	DrawerClose,
 	DrawerTitle,
 	DrawerDescription,
-} from '@shadcn/drawer';
+} from '@/shared/components/ui/drawer';
 import {
 	SparklesIcon,
 	ShirtIcon,
@@ -28,11 +28,11 @@ import {
 	SearchIcon,
 	ChevronDownIcon,
 } from 'lucide-react';
-import { APP_NAME, APP_ROUTES } from '@/config/constants';
+import { APP_NAME, APP_ROUTES } from '@/core/config/constants';
 import { Category } from '@/types';
 import UserProfileMenu from './ProfileMenu';
-import AppContext from '@/contexts/AppProvider';
-import { useDebouncedResize } from '@/hooks/use-debounced-resize';
+import AppContext from '@/core/contexts/AppProvider';
+import { useDebouncedResize } from '@/shared/hooks/use-debounced-resize';
 import { humanize } from '@/features/category/utils/format';
 
 interface CategoryElement {

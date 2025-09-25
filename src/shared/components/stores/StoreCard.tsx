@@ -1,4 +1,4 @@
-import { APP_ROUTES } from '@/config/constants';
+import { APP_ROUTES } from '@/core/config/constants';
 import { Store } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 import { Link } from 'react-router-dom';

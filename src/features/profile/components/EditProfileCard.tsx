@@ -1,4 +1,4 @@
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/shared/components/ui/card';
 import { motion } from 'framer-motion';
 import { ProfileHeader } from './profileHeader';
 import { Profile } from './forms/profile';

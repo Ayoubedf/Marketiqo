@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { APP_ROUTES } from '@/config/constants';
-import { renderFieldError } from '@/utils/renderFieldError';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
+import { APP_ROUTES } from '@/core/config/constants';
+import { renderFieldError } from '@/shared/utils/renderFieldError';
 import { Link } from 'react-router-dom';
 import UseAnimations from 'react-useanimations';
 import visibility from 'react-useanimations/lib/visibility2';

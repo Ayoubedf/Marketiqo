@@ -1,6 +1,6 @@
-import { APP_NAME, APP_ROUTES } from '@/config/constants';
+import { APP_NAME, APP_ROUTES } from '@/core/config/constants';
 import { useAuthActions } from '@/features/auth';
-import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { isApiError } from '@/types';
 import { useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';

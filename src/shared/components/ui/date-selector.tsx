@@ -1,13 +1,13 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@/shared/components/ui/button';
+import { Calendar } from '@/shared/components/ui/calendar';
 import {
 	Collapsible,
 	CollapsibleContent,
 	CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { ScrollArea } from '@/components/ui/scroll-area';
+} from '@/shared/components/ui/collapsible';
+import { ScrollArea } from '@/shared/components/ui/scroll-area';
 import {
 	eachMonthOfInterval,
 	eachYearOfInterval,

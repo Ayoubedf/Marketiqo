@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 import useCreateStore from '../../hooks/use-create-store';
-import { Input } from '@/components/ui/input';
-import { renderFieldError } from '@/utils/renderFieldError';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { CategoryCheckboxes } from '@/components/common/CategoryCheckboxes';
+import { Input } from '@/shared/components/ui/input';
+import { renderFieldError } from '@/shared/utils/renderFieldError';
+import { Textarea } from '@/shared/components/ui/textarea';
+import { Button } from '@/shared/components/ui/button';
+import { CategoryCheckboxes } from '@/shared/components/common/CategoryCheckboxes';
 
 export const CreateStore = () => {
 	const {

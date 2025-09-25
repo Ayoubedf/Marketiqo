@@ -1,4 +1,4 @@
-import env from '@/config/env';
+import env from '@/core/config/env';
 import axios, { Axios } from 'axios';
 import { ApiError, toApiError } from '@/types';
 import { notify } from '@/lib/notify';

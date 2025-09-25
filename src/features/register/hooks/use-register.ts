@@ -1,10 +1,10 @@
-import { APP_NAME, APP_ROUTES } from '@/config/constants';
+import { APP_NAME, APP_ROUTES } from '@/core/config/constants';
 import { useAuthActions } from '@/features/auth';
-import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { notify } from '@/lib/notify';
 import { isApiError, RegisterRequestPayload, ValidationErrors } from '@/types';
-import { validateSchema } from '@/utils/validation';
-import { registerSchema } from '@/utils/validation/schemas';
+import { validateSchema } from '@/shared/utils/validation';
+import { registerSchema } from '@/shared/utils/validation/schemas';
 import React, {
 	useCallback,
 	useEffect,

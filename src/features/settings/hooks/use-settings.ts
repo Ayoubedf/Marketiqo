@@ -1,11 +1,11 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useAuthActions } from '@/features/auth';
 import { PasswordChangePayload } from '@/types';
-import { validateSchema } from '@/utils/validation';
+import { validateSchema } from '@/shared/utils/validation';
 import { notify } from '@/lib/notify';
-import { changePasswordSchema } from '@/utils/validation/schemas';
-import { APP_NAME } from '@/config/constants';
-import { useDocumentTitle } from '@/hooks/use-document-title';
+import { changePasswordSchema } from '@/shared/utils/validation/schemas';
+import { APP_NAME } from '@/core/config/constants';
+import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 
 interface ValidationErrors {
 	current_password?: string;

@@ -1,4 +1,4 @@
-import { APP_ROUTES } from '@/config/constants';
+import { APP_ROUTES } from '@/core/config/constants';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 

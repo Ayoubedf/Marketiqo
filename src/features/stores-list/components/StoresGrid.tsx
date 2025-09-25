@@ -1,6 +1,6 @@
-import ErrorMessage from '@/components/common/ErrorMessage';
-import StoreCard from '@/components/stores/StoreCard';
-import StoreSkeleton from '@/components/stores/StoreSkeleton';
+import ErrorMessage from '@/shared/components/common/ErrorMessage';
+import StoreCard from '@/shared/components/stores/StoreCard';
+import StoreSkeleton from '@/shared/components/stores/StoreSkeleton';
 import { ApiError, Store } from '@/types';
 import { motion } from 'framer-motion';
 

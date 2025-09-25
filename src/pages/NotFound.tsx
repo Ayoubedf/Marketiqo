@@ -1,9 +1,9 @@
-import { APP_NAME, APP_ROUTES } from '@/config/constants';
-import { Button } from '@shadcn/button';
+import { APP_NAME, APP_ROUTES } from '@/core/config/constants';
+import { Button } from '@/shared/components/ui/button';
 import { ArrowLeftIcon, HomeIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { useMemo } from 'react';
 
 export default function NotFound() {

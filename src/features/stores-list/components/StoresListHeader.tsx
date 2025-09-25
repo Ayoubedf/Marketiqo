@@ -1,4 +1,4 @@
-import { APP_NAME } from '@/config/constants';
+import { APP_NAME } from '@/core/config/constants';
 import { motion } from 'framer-motion';
 
 export const StoresListHeader = () => {

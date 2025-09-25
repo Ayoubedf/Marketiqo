@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import ProductsGrid from '@/components/products/ProductsGrid';
+import ProductsGrid from '@/shared/components/products/ProductsGrid';
 import { useProducts } from '../hooks/use-products';
 
 export const FeaturedProducts = () => {

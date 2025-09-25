@@ -1,5 +1,5 @@
 import { Category } from '@/types';
-import { capitalize } from '@/utils/capitalize';
+import { capitalize } from '@/shared/utils/capitalize';
 
 export const humanize = (str: string): string => {
 	if (!str) return str;

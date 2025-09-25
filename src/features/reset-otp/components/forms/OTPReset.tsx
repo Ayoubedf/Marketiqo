@@ -1,10 +1,10 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/shared/components/ui/button';
 import {
 	InputOTP,
 	InputOTPGroup,
 	InputOTPSeparator,
 	InputOTPSlot,
-} from '@/components/ui/input-otp';
+} from '@/shared/components/ui/input-otp';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { FormEvent, RefObject } from 'react';
 

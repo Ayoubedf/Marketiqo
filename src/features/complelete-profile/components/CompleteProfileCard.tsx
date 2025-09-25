@@ -1,9 +1,9 @@
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/shared/components/ui/card';
 import { motion } from 'framer-motion';
 import { Profile, ProfileHeader } from '@/features/profile';
 import useProfile from '../hooks/use-complete-profile';
 import { Navigate } from 'react-router-dom';
-import { APP_ROUTES } from '@/config/constants';
+import { APP_ROUTES } from '@/core/config/constants';
 
 const CompleteProfileCard = () => {
 	const props = useProfile();

@@ -1,16 +1,16 @@
-import ErrorMessage from '@/components/common/ErrorMessage';
+import ErrorMessage from '@/shared/components/common/ErrorMessage';
 import { useStoreDetails } from '../hooks/use-store-details';
-import StoreDetailsSkeleton from '@/components/stores/StoreDetailsSkeleton';
-import { Button } from '@/components/ui/button';
+import StoreDetailsSkeleton from '@/shared/components/stores/StoreDetailsSkeleton';
+import { Button } from '@/shared/components/ui/button';
 import { Link } from 'react-router-dom';
 import { AlertCircleIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AvatarFallback } from '@radix-ui/react-avatar';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarImage } from '@/shared/components/ui/avatar';
 import { AddProduct } from './actions/AddProduct';
 import { ManageStore } from './actions/ManageStore';
 import { Store } from '@/types';
-import ProductsGrid from '@/components/products/ProductsGrid';
+import ProductsGrid from '@/shared/components/products/ProductsGrid';
 
 const StoreHeader = ({ store }: { store: Store }) => {
 	return (
