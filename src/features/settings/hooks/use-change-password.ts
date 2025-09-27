@@ -1,11 +1,9 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useAuthActions } from '@/features/auth';
 import { PasswordChangePayload } from '@/types';
 import { validateSchema } from '@/shared/utils/validation';
 import { notify } from '@/lib/notify';
 import { changePasswordSchema } from '@/shared/utils/validation/schemas';
-import { APP_NAME } from '@/core/config/constants';
-import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 
 interface ValidationErrors {
 	current_password?: string;
@@ -13,7 +11,7 @@ interface ValidationErrors {
 	password_confirm?: string;
 }
 
-export function useSettings() {
+export function useChangePassword() {
 	const { updatePassword } = useAuthActions();
 	const currentPasswordRef = useRef<HTMLInputElement>(null);
 	const newPasswordRef = useRef<HTMLInputElement>(null);
@@ -74,9 +72,6 @@ export function useSettings() {
 		await updatePassword(data);
 		setIsSubmitting(false);
 	};
-
-	const title = useMemo(() => `Settings | ${APP_NAME}`, []);
-	useDocumentTitle(title);
 
 	return {
 		refs: {

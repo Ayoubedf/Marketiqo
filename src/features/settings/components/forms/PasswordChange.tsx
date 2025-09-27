@@ -1,5 +1,5 @@
 import { Input } from '@/shared/components/ui/input';
-import { useSettings } from '../../hooks/use-settings';
+import { useChangePassword } from '../../hooks/use-change-password';
 import UseAnimations from 'react-useanimations';
 import visibility from 'react-useanimations/lib/visibility2';
 import { renderFieldError } from '@/shared/utils/renderFieldError';
@@ -16,7 +16,7 @@ export function PasswordChange() {
 		validateField,
 		validationErrors,
 		isSubmitting,
-	} = useSettings();
+	} = useChangePassword();
 
 	return (
 		<form onSubmit={handlePasswordUpdate} noValidate className="space-y-4">

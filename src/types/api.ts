@@ -71,6 +71,18 @@ export interface searchProductsParams {
 	query: string;
 }
 
+export type DeviceLabel = 'Desktop' | 'Mobile' | 'Tablet';
+
+export interface ISession {
+	sessionId: string;
+	userId: string;
+	userAgent?: string;
+	ip?: string;
+	createdAt: string; // ISO string from backend
+	updatedAt: string;
+	current?: true;
+}
+
 export interface Product {
 	_id: number;
 	name: string;

@@ -3,9 +3,15 @@ import { TrashIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { notify } from '@/lib/notify';
 import { itemVariants } from '@/shared/animations';
-import { PasswordSection } from '@/features/settings';
+import { ActiveSessionsSection, PasswordSection } from '@/features/settings';
+import { useDocumentTitle } from '@/shared/hooks/use-document-title';
+import { useMemo } from 'react';
+import { APP_NAME } from '@/core/config/constants';
 
 const Settings = () => {
+	const title = useMemo(() => `Settings | ${APP_NAME}`, []);
+	useDocumentTitle(title);
+
 	return (
 		<motion.div
 			initial="hidden"
@@ -18,6 +24,9 @@ const Settings = () => {
 
 			{/* Password Section */}
 			<PasswordSection />
+
+			{/* Active Sessions Section */}
+			<ActiveSessionsSection />
 
 			{/* Delete Section */}
 			<div>
