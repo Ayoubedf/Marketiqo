@@ -59,7 +59,7 @@ export const HeroBanner = () => {
 					className="mb-8 flex flex-col space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4 lg:mb-16"
 				>
 					<Button className="h-auto bg-blue-700 hover:bg-blue-600" asChild>
-						<Link className="group" to={APP_ROUTES.CREATE_STORE}>
+						<Link className="group" to={APP_ROUTES.STORES.CREATE}>
 							Get Started
 							<ArrowRightIcon
 								className="-me-1 opacity-60 transition-transform group-hover:translate-x-0.5"

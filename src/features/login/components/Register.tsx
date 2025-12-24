@@ -12,7 +12,7 @@ export const Register = () => {
 		>
 			Don&apos;t have an account?
 			<Link
-				to={APP_ROUTES.REGISTER}
+				to={APP_ROUTES.AUTH.REGISTER}
 				className="ms-1 font-semibold text-blue-600 hover:text-blue-500"
 			>
 				Register

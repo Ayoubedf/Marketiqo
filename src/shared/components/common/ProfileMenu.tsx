@@ -24,7 +24,7 @@ import {
 	StoreIcon,
 	UserPenIcon,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function ProfileMenu() {
 	const { state } = useAuthState() as AuthContextState;
@@ -47,11 +47,8 @@ export default function ProfileMenu() {
 	const navigate = useNavigate();
 	const handleLogout = () => {
 		logout();
-		navigate(APP_ROUTES.LOGIN, { replace: true });
+		navigate(APP_ROUTES.AUTH.LOGIN, { replace: true });
 	};
-
-	const storeId =
-		typeof user.store === 'string' ? user.store : (user.store?._id ?? '');
 
 	return (
 		<DropdownMenu>
@@ -69,7 +66,7 @@ export default function ProfileMenu() {
 					</Avatar>
 					<ChevronDownIcon
 						size={16}
-						className="opacity-60 transition-transform duration-700 [transition-timing-function:cubic-bezier(0.68,-0.6,0.32,1.6)] group-aria-expanded:rotate-[180deg]"
+						className="opacity-60 transition-transform duration-700 [transition-timing-function:cubic-bezier(0.68,-0.6,0.32,1.6)] group-aria-expanded:rotate-180"
 						aria-hidden="true"
 					/>
 				</Button>
@@ -87,41 +84,67 @@ export default function ProfileMenu() {
 				<DropdownMenuGroup>
 					{state.user ? (
 						<>
-							<DropdownMenuItem onClick={() => navigate(APP_ROUTES.PROFILE)}>
-								<UserPenIcon
-									size={16}
-									className="opacity-60"
-									aria-hidden="true"
-								/>
-								<span>Edit Profile</span>
-							</DropdownMenuItem>
-
-							{state.user.role === 'merchant' && (
-								<DropdownMenuItem
-									onClick={() => navigate(APP_ROUTES.STORE_DETAILS(storeId))}
-								>
-									<StoreIcon
+							<Link
+								to={APP_ROUTES.PROFILE}
+								className="font-normal text-inherit no-underline"
+							>
+								<DropdownMenuItem>
+									<UserPenIcon
 										size={16}
 										className="opacity-60"
 										aria-hidden="true"
 									/>
-									<span>My Store</span>
+									<span>Edit Profile</span>
 								</DropdownMenuItem>
-							)}
+							</Link>
 
-							<DropdownMenuItem onClick={() => navigate(APP_ROUTES.SETTINGS)}>
-								<BoltIcon size={16} className="opacity-60" aria-hidden="true" />
-								<span>Settings</span>
-							</DropdownMenuItem>
+							{state.user.role === 'merchant' && (
+								<Link
+									to={APP_ROUTES.STORES.DETAILS(user.store?._id ?? '')}
+									className="font-normal text-inherit no-underline"
+								>
+									<DropdownMenuItem>
+										<StoreIcon
+											size={16}
+											className="opacity-60"
+											aria-hidden="true"
+										/>
+										<span>My Store</span>
+									</DropdownMenuItem>
+								</Link>
+							)}
+							<Link
+								to={APP_ROUTES.SETTINGS}
+								className="font-normal text-inherit no-underline"
+							>
+								<DropdownMenuItem>
+									<BoltIcon
+										size={16}
+										className="opacity-60"
+										aria-hidden="true"
+									/>
+									<span>Settings</span>
+								</DropdownMenuItem>
+							</Link>
 						</>
 					) : (
 						<>
-							<DropdownMenuItem onClick={() => navigate(APP_ROUTES.LOGIN)}>
-								<span>Log In</span>
-							</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => navigate(APP_ROUTES.REGISTER)}>
-								<span>Sign Up</span>
-							</DropdownMenuItem>
+							<Link
+								to={APP_ROUTES.AUTH.LOGIN}
+								className="font-normal text-inherit no-underline"
+							>
+								<DropdownMenuItem>
+									<span>Log In</span>
+								</DropdownMenuItem>
+							</Link>
+							<Link
+								to={APP_ROUTES.AUTH.REGISTER}
+								className="font-normal text-inherit no-underline"
+							>
+								<DropdownMenuItem>
+									<span>Sign Up</span>
+								</DropdownMenuItem>
+							</Link>
 						</>
 					)}
 				</DropdownMenuGroup>

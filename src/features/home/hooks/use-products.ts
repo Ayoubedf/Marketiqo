@@ -1,7 +1,7 @@
 import { useAxiosPrivate } from '@/features/auth';
 import { ApiError, getProductsParams, isApiError, Product } from '@/types';
 import { useCallback, useEffect, useState } from 'react';
-import * as productService from '@/services/productService';
+import { getProducts } from '@/services/productService';
 
 export const useProducts = () => {
 	const [products, setProducts] = useState<Product[] | null>(null);
@@ -9,9 +9,9 @@ export const useProducts = () => {
 	const [error, setError] = useState<ApiError | null>(null);
 	const axiosPrivate = useAxiosPrivate();
 
-	const getProducts = useCallback(
+	const handleGetProducts = useCallback(
 		(params: getProductsParams, controller?: AbortController) =>
-			productService.getProducts(axiosPrivate, params, controller),
+			getProducts(axiosPrivate, params, controller),
 		[axiosPrivate]
 	);
 
@@ -20,17 +20,17 @@ export const useProducts = () => {
 		setLoading(true);
 
 		const fetchProducts = async () => {
-			const response = await getProducts({ pageSize: 3 }, controller);
+			const response = await handleGetProducts({ limit: 3 }, controller);
 			if (isApiError(response)) {
 				if (response.code === 'REQUEST_CANCELLED') return;
 				setError(response);
-			} else setProducts(response);
+			} else setProducts(response.items);
 			setLoading(false);
 		};
 
 		fetchProducts();
 		return () => controller.abort();
-	}, [getProducts]);
+	}, [handleGetProducts]);
 
 	return {
 		error,

@@ -6,7 +6,7 @@ import { apiRequest } from './api';
 export async function getSessions(axios: Axios, controller?: AbortController) {
 	return apiRequest<ISession[]>(
 		{
-			url: API_ENDPOINTS.SESSIONS,
+			url: API_ENDPOINTS.SESSIONS.ROOT,
 			method: 'GET',
 			signal: controller?.signal,
 		},

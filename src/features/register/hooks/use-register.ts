@@ -106,7 +106,7 @@ export const useRegister = () => {
 
 		if (!isApiError(response)) {
 			resetForm();
-			navigate(APP_ROUTES.LOGIN);
+			navigate(APP_ROUTES.AUTH.LOGIN);
 		}
 	};
 

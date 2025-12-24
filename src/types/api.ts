@@ -1,19 +1,36 @@
-import { AxiosError, isCancel } from 'axios';
+import { AxiosError, isAxiosError, isCancel } from 'axios';
 import { User } from './auth';
 import { SentMessageInfo } from 'nodemailer';
 
 export type Token = string | null;
 
-export interface AccessTokenPayload {
-	id: string;
+export interface TokenPayload {
 	iat: number;
 	exp: number;
+	aud?: string;
+	iss?: string;
+	jti?: string;
 }
 
-export interface ResetTokenPayload {
+export interface AccessTokenPayload extends TokenPayload {
+	sub: string; // userId
+}
+
+export interface ResetTokenPayload extends TokenPayload {
+	sub: string; // email
+}
+
+export interface TempTokenPayload extends TokenPayload {
+	sub: TempUser;
+}
+export interface TempUser {
+	oauth_id: string;
+	oauth_provider: string;
+	avatar: string;
 	email: string;
-	iat: number;
-	exp: number;
+	isVerified: boolean;
+	name: string;
+	birthDate: Date;
 }
 
 export interface ApiResponse<T> {
@@ -59,12 +76,17 @@ export interface VerifyOtpPayload {
 export interface ResetConfPasswordPayload {
 	password: string;
 	password_confirm: string;
-	resetToken: Token;
+	reset_token: Token;
 }
 
 export interface getProductsParams {
 	category?: Category | null;
-	pageSize?: number;
+	limit?: number;
+	minPrice?: number;
+	maxPrice?: number;
+	minRate?: number;
+	maxRate?: number;
+	feature?: string;
 }
 
 export interface searchProductsParams {
@@ -84,13 +106,13 @@ export interface ISession {
 }
 
 export interface Product {
-	_id: number;
+	_id: string;
 	name: string;
 	description: string;
 	imageAlt: string;
 	imageSrc: string;
 	price: {
-		old: number;
+		old?: number;
 		current: number;
 	};
 	feature?: string;
@@ -126,11 +148,16 @@ export interface Store {
 
 export interface AuthResponse {
 	user: User;
-	token: Token;
+	access_token: Token;
+}
+
+export interface RefreshResponse {
+	access_token: Token;
+	user: User;
 }
 
 export interface VerifyOtpResponse {
-	resetToken: Token;
+	reset_token: Token;
 }
 
 export interface PasswordResetResponse {
@@ -139,6 +166,13 @@ export interface PasswordResetResponse {
 		_id: string;
 		email: string;
 	};
+}
+
+export interface ProductsResponse {
+	items: Product[];
+	total: number;
+	page: number;
+	limit: number;
 }
 
 export interface ApiError {
@@ -159,16 +193,27 @@ export function toApiError(error: unknown): ApiError {
 		};
 	}
 
-	if (error && typeof error === 'object' && 'isAxiosError' in error) {
-		const axiosErr = error as AxiosError<Partial<ApiError>>;
-		return {
-			status: axiosErr.response?.status ?? 500,
-			code: axiosErr.code ?? 'AXIOS_ERROR',
-			message: axiosErr.response?.data?.message ?? axiosErr.message,
-			details: axiosErr.response?.data?.details,
-			fields: axiosErr.response?.data?.fields,
-			meta: axiosErr.toJSON(),
-		};
+	if (error && typeof error === 'object') {
+		if (isAxiosError(error)) {
+			const axiosErr = error as AxiosError<Partial<ApiError>>;
+			return {
+				status: axiosErr.response?.status ?? 500,
+				code: axiosErr.code ?? 'AXIOS_ERROR',
+				message: axiosErr.response?.data?.message ?? axiosErr.message,
+				details: axiosErr.response?.data?.details,
+				fields: axiosErr.response?.data?.fields,
+				meta: axiosErr.toJSON(),
+			};
+		}
+
+		if (isApiError(error)) {
+			return {
+				status: error.status,
+				code: error.code,
+				message: error.message,
+				details: error.message,
+			};
+		}
 	}
 
 	return {

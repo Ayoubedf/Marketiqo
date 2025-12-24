@@ -21,24 +21,30 @@ import NotFound from '@/pages/NotFound';
 const AppRoutes = () => (
 	<Routes>
 		<Route path={APP_ROUTES.HOME} element={<Layout />}>
-			<Route path={APP_ROUTES.LOGIN} element={<Login />} />
-			<Route path={APP_ROUTES.REGISTER} element={<Register />} />
-			<Route path={APP_ROUTES.COMPLETE_PROFILE} element={<CompleteProfile />} />
-			<Route path={APP_ROUTES.PASS_RESET} element={<OTPReset />} />
-			<Route path={APP_ROUTES.PASS_CHANGE} element={<ResetPassword />} />
+			<Route path={APP_ROUTES.AUTH.LOGIN} element={<Login />} />
+			<Route path={APP_ROUTES.AUTH.REGISTER} element={<Register />} />
+			<Route
+				path={APP_ROUTES.AUTH.COMPLETE_PROFILE}
+				element={<CompleteProfile />}
+			/>
+			<Route path={APP_ROUTES.AUTH.PASSWORD.RESET} element={<OTPReset />} />
+			<Route
+				path={APP_ROUTES.AUTH.PASSWORD.CHANGE}
+				element={<ResetPassword />}
+			/>
 
 			<Route element={<RequireAuth />}>
 				<Route index element={<Home />} />
 				<Route path={APP_ROUTES.CATEGORY(':cat')} element={<Category />} />
 				<Route path={APP_ROUTES.COLLECTIONS(':q?')} element={<Collections />} />
-				<Route path={APP_ROUTES.STORES} element={<StoresList />} />
+				<Route path={APP_ROUTES.STORES.ROOT} element={<StoresList />} />
 				<Route
-					path={APP_ROUTES.STORE_DETAILS(':id')}
+					path={APP_ROUTES.STORES.DETAILS(':id')}
 					element={<StoreDetails />}
 				/>
 				<Route path={APP_ROUTES.PROFILE} element={<Profile />} />
 				<Route path={APP_ROUTES.SETTINGS} element={<Settings />} />
-				<Route path={APP_ROUTES.CREATE_STORE} element={<CreateStore />} />
+				<Route path={APP_ROUTES.STORES.CREATE} element={<CreateStore />} />
 			</Route>
 		</Route>
 

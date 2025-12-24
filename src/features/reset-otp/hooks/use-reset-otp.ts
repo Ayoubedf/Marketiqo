@@ -26,7 +26,7 @@ export const useResetOtp = () => {
 		setIsSubmitting(false);
 
 		if (!isApiError(response)) {
-			navigate(APP_ROUTES.PASS_CHANGE, { replace: true });
+			navigate(APP_ROUTES.AUTH.PASSWORD.CHANGE, { replace: true });
 		}
 	};
 

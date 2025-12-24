@@ -1,7 +1,7 @@
 import { APP_NAME } from '@/core/config/constants';
 import { useAxiosPrivate } from '@/features/auth';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
-import * as productService from '@/services/productService';
+import { searchProducts } from '@/services/productService';
 import { ApiError, isApiError, Product, searchProductsParams } from '@/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -17,9 +17,9 @@ export default function useCollection() {
 	const { q: query } = useParams<Params>();
 
 	const axiosPrivate = useAxiosPrivate();
-	const searchProducts = useCallback(
+	const handleSearchProducts = useCallback(
 		(params: searchProductsParams, controller?: AbortController) =>
-			productService.searchProducts(axiosPrivate, params, controller),
+			searchProducts(axiosPrivate, params, controller),
 		[axiosPrivate]
 	);
 
@@ -28,17 +28,20 @@ export default function useCollection() {
 		setLoading(true);
 
 		const fetchProducts = async () => {
-			const response = await searchProducts({ query: query || '' }, controller);
+			const response = await handleSearchProducts(
+				{ query: query || '' },
+				controller
+			);
 			if (isApiError(response)) {
 				if (response.code === 'REQUEST_CANCELLED') return;
 				setError(response);
-			} else setProducts(response);
+			} else setProducts(response.items);
 			setLoading(false);
 		};
 
 		fetchProducts();
 		return () => controller.abort();
-	}, [query, searchProducts]);
+	}, [query, handleSearchProducts]);
 
 	const title = useMemo(() => `Collections | ${APP_NAME}`, []);
 	useDocumentTitle(title);

@@ -54,6 +54,9 @@ export const addProductSchema: ValidationSchema<Partial<AddProductFormValues>> =
 			number: true,
 			min: 0,
 		},
+		category: {
+			required: true,
+		},
 	};
 
 export const manageStoreSchema: ValidationSchema<

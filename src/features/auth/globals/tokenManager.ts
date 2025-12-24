@@ -1,12 +1,6 @@
-import { Token } from '@/types';
+import { ResetTokenPayload, Token } from '@/types';
 import { jwtDecode } from 'jwt-decode';
 type TokenListener = (accessToken: Token, resetToken: Token) => void;
-
-interface ResetTokenPayload {
-	email: string;
-	iat: number;
-	exp: number;
-}
 
 export class TokenManager {
 	private accessToken: Token = null;

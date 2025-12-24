@@ -105,7 +105,7 @@ export const useLogin = () => {
 			email: emailRef.current?.value || '',
 		});
 		if (!isApiError(response)) {
-			navigate(APP_ROUTES.PASS_RESET, {
+			navigate(APP_ROUTES.AUTH.PASSWORD.RESET, {
 				state: { email: emailRef.current?.value },
 			});
 		}

@@ -28,7 +28,7 @@ export const ManageStore = ({ store }: ManageStoreProps) => {
 		logo,
 		handleChange,
 		categories,
-	} = useStoreManager(store.categories);
+	} = useStoreManager(store._id, store.categories);
 
 	const storeLogo = logo.previewUrl || store.logo;
 	return (

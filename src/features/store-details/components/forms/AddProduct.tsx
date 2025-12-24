@@ -10,16 +10,28 @@ import {
 	DialogTitle,
 } from '@/shared/components/ui/dialog';
 import { useAddProduct } from '../../hooks/use-add-product';
+import { useParams } from 'react-router-dom';
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/shared/components/ui/select';
+import { categoryList } from '@/types';
+import { capitalize } from '@/shared/utils/capitalize';
 
 export const AddProduct = () => {
+	const { id = '' } = useParams();
 	const {
-		refs: { nameRef, descRef, priceRef },
+		refs: { nameRef, descRef, priceRef, category, setCategory },
 		preview,
 		validateField,
 		validationErrors,
 		handleSubmit,
 		isSubmitting,
-	} = useAddProduct();
+	} = useAddProduct(id);
 
 	return (
 		<form onSubmit={handleSubmit} noValidate className="py-6 pr-10 pl-6">
@@ -40,6 +52,7 @@ export const AddProduct = () => {
 						ref={nameRef}
 						id="name-1"
 						name="name"
+						autoComplete="product"
 						aria-invalid={!!validationErrors.name}
 						aria-required="true"
 						aria-describedby={validationErrors.name ? 'name-error' : undefined}
@@ -111,6 +124,31 @@ export const AddProduct = () => {
 						onBlur={() => validateField('price')}
 					/>
 					{renderFieldError(validationErrors.price, 'price')}
+				</div>
+
+				<div className="grid">
+					<Label htmlFor="category-1" className="mb-3">
+						Category
+					</Label>
+					<Select name="category" value={category} onValueChange={setCategory}>
+						<SelectTrigger id="category-1" className="w-45">
+							<SelectValue placeholder="Select a category" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								{categoryList.map((cat) => (
+									<SelectItem
+										className="data-highlighted:bg-accent data-highlighted:text-accent-foreground relative flex cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm data-disabled:pointer-events-none data-disabled:opacity-50"
+										key={cat}
+										value={cat}
+									>
+										{capitalize(cat)}
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+					{renderFieldError(validationErrors.category, 'category')}
 				</div>
 			</div>
 

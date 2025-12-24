@@ -2,6 +2,7 @@ import { Product } from '@/types';
 import { StarIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { API_ENDPOINTS } from '@/core/config/constants';
 
 type ProductFeature =
 	| 'new'
@@ -31,7 +32,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 			whileInView={{ y: 0, opacity: 1 }}
 			transition={{ ease: 'easeOut' }}
 			viewport={{ once: true }}
-			className="group relative mx-auto grid max-w-96 grid-rows-1 overflow-clip rounded-xl border-[1px] border-gray-500/10 shadow-sm dark:border-gray-200/20"
+			className="group relative mx-auto grid max-w-96 grid-rows-1 overflow-clip rounded-xl border border-gray-500/10 shadow-sm dark:border-gray-200/20"
 		>
 			{featureColor && (
 				<span
@@ -43,23 +44,27 @@ const ProductCard = ({ product }: { product: Product }) => {
 			<div className="w-full overflow-clip rounded-t-xl bg-gray-200 group-hover:opacity-75 lg:h-80">
 				<img
 					alt={product.imageAlt}
-					src={`/assets/images/products/${product.imageSrc}`}
+					src={product.imageSrc}
 					loading="lazy"
 					className="h-full w-full object-cover object-center lg:h-full lg:w-full"
 				/>
 			</div>
 			<div className="rounded-b-xl bg-white p-5 dark:bg-gray-800">
 				<h3 className="text-base font-semibold text-gray-700 dark:text-gray-200">
-					<Link to={product.href}>{product.name}</Link>
+					<Link to={API_ENDPOINTS.PRODUCTS.DETAILS(product._id)}>
+						{product.name}
+					</Link>
 				</h3>
 
 				<p className="mt-3 mb-5 line-clamp-3 justify-center text-sm text-gray-500 dark:text-gray-400">
 					{product.description}
 				</p>
 				<div className="flex gap-2">
-					<del className="text-sm font-medium text-gray-600 dark:text-gray-400">
-						${product.price.old}
-					</del>
+					{product.price.old && (
+						<del className="text-sm font-medium text-gray-600 dark:text-gray-400">
+							${product.price.old}
+						</del>
+					)}
 					<span className="text-sm font-medium text-gray-900 dark:text-gray-100">
 						${product.price.current}
 					</span>
@@ -89,4 +94,3 @@ const ProductCard = ({ product }: { product: Product }) => {
 };
 
 export default ProductCard;
-

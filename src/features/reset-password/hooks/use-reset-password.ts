@@ -30,7 +30,7 @@ export const useResetPassword = () => {
 		(): ResetConfPasswordPayload => ({
 			password: newPasswordRef.current?.value.trim() || '',
 			password_confirm: confirmPasswordRef.current?.value.trim() || '',
-			resetToken,
+			reset_token: resetToken,
 		}),
 		[resetToken]
 	);
@@ -69,7 +69,7 @@ export const useResetPassword = () => {
 		if (isApiError(response)) {
 			setError(response);
 		} else {
-			navigate(APP_ROUTES.LOGIN, { replace: true });
+			navigate(APP_ROUTES.AUTH.LOGIN, { replace: true });
 		}
 	};
 

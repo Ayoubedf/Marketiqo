@@ -80,12 +80,12 @@ export interface AuthActions {
 	register: Register;
 	completeProfile: CompleteProfile;
 	login: Login;
+	logout: Logout;
 	updateProfile: UpdateProfile;
 	updatePassword: UpdatePassword;
 	resetPassword: ResetPassword;
 	resetConfPassword: ResetConfPassword;
 	verifyOTP: VerifyOTP;
-	logout: Logout;
 }
 
 export interface ErrorResponse {

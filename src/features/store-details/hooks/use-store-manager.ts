@@ -3,11 +3,13 @@ import { notify } from '@/lib/notify';
 import { Category, StoreValidationErrors } from '@/types';
 import { validateSchema } from '@/shared/utils/validation';
 import { manageStoreSchema } from '@/shared/utils/validation/schemas';
-import { AxiosError } from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useAuthState, useAxiosPrivate } from '@/features/auth';
+import { updateStore } from '@/services/storeService';
 
-export const useStoreManager = (defaultCategories: Category[]) => {
+export const useStoreManager = (id: string, defaultCategories: Category[]) => {
 	const logo = useImageUpload();
+	useAuthState();
 	const nameRef = useRef<HTMLInputElement>(null);
 	const descRef = useRef<HTMLTextAreaElement>(null);
 	const [categories, setCategories] = useState<Category[]>(
@@ -16,7 +18,15 @@ export const useStoreManager = (defaultCategories: Category[]) => {
 	const categoriesUpdated = useRef(false);
 	const [validationErrors, setValidationErrors] =
 		useState<StoreValidationErrors>({});
-	const [isSubmitting] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const axiosPrivate = useAxiosPrivate();
+	const handleUpdateStore = useCallback(
+		(data: FormData) => updateStore(axiosPrivate, id, data),
+		[axiosPrivate, id]
+	);
+	// const navigate = useNavigate();
+	const MAX_FILE_SIZE_MB = 5;
 
 	interface StoreDetailsFormValues {
 		name: string;
@@ -64,6 +74,14 @@ export const useStoreManager = (defaultCategories: Category[]) => {
 		);
 	};
 
+	// const resetForm = () => {
+	// 	if (nameRef.current) nameRef.current.value = '';
+	// 	if (descRef.current) descRef.current.value = '';
+	// 	if (categories.length) setCategories([]);
+	// 	logo.handleRemove();
+	// 	setValidationErrors({});
+	// };
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setValidationErrors({});
@@ -71,9 +89,18 @@ export const useStoreManager = (defaultCategories: Category[]) => {
 		const formData = new FormData();
 		formData.append('name', nameRef.current?.value as string);
 		formData.append('description', descRef.current?.value as string);
-		if (file) formData.append('logo', file);
+		if (file) {
+			formData.append('logo', file);
+			if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+				notify.error("Can't upload file", {
+					description: `File too large. Max size is ${MAX_FILE_SIZE_MB}MB.`,
+				});
+				logo.handleRemove();
+				return;
+			}
+		}
 		categories.forEach((category) => {
-			formData.append('categories', category);
+			formData.append('categories[]', category);
 		});
 
 		if (!validate()) {
@@ -84,20 +111,9 @@ export const useStoreManager = (defaultCategories: Category[]) => {
 			return;
 		}
 
-		try {
-			notify.success('Store Updated.', {
-				description: 'Your store has been updated successfully.',
-			});
-		} catch (error) {
-			console.error('Error', error);
-
-			notify.error('failed to Update Store', {
-				description:
-					error instanceof AxiosError
-						? error.response?.data.message
-						: 'Something went wrong while updating the store.',
-			});
-		}
+		setIsSubmitting(true);
+		await handleUpdateStore(formData);
+		setIsSubmitting(false);
 	};
 
 	useEffect(() => {

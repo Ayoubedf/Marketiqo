@@ -109,7 +109,7 @@ export const Login = () => {
 					</label>
 				</div>
 				<Link
-					to={APP_ROUTES.PASS_RESET}
+					to={APP_ROUTES.AUTH.PASSWORD.RESET}
 					onClick={handleForgotPassword}
 					className="text-sm font-semibold text-blue-600 hover:text-blue-500"
 				>

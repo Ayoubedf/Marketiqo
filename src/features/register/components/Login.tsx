@@ -12,7 +12,7 @@ export const Login = () => {
 		>
 			Already have an account?
 			<Link
-				to={APP_ROUTES.LOGIN}
+				to={APP_ROUTES.AUTH.LOGIN}
 				className="ms-1 font-semibold text-blue-600 hover:text-blue-500"
 			>
 				Sign in

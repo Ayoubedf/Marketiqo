@@ -3,55 +3,71 @@ import env from './env';
 import { slugify } from '@/features/category/utils/format';
 
 export const API_ENDPOINTS = {
-	USERS: '/users',
-	SESSIONS: '/sessions',
-	PRODUCTS: '/products',
-	PRODUCT_CATEGORY: (cat: Category | ':cat') =>
-		`/products/${cat === ':cat' ? cat : slugify(cat)}`,
-	PRODUCTS_SEARCH: '/products/search',
-	STORE: '/stores',
-	STORE_DETAILS: (id: string) => `/stores/${id}`,
-	LOGIN: '/auth/login',
-	LOGIN_GOOGLE: '/auth/google',
-	LOGIN_GITHUB: '/auth/github',
-	REGISTER: '/auth/register',
-	COMPLETE_PROFILE: '/auth/complete-profile',
-	LOGOUT: '/auth/logout',
-	PASS_RESET_REQUEST: '/auth/password/reset',
-	PASS_RESET_CONFIRM: '/auth/password/reset/confirm',
-	PASS_CHANGE: '/users/password/change',
-	VERIFY_OTP: '/auth/verify-otp',
-	PROFILE: '/users/profile',
-	REFRESH: '/refresh',
+	AUTH: {
+		LOGIN: '/auth/login',
+		LOGIN_GOOGLE: '/auth/google',
+		LOGIN_GITHUB: '/auth/github',
+		REGISTER: '/auth/register',
+		COMPLETE_PROFILE: '/auth/complete-profile',
+		LOGOUT: '/auth/logout',
+		REFRESH: '/auth/refresh',
+		VERIFY_OTP: '/auth/verify-otp',
+		PASSWORD: {
+			RESET_REQUEST: '/auth/password/reset',
+			RESET_CONFIRM: '/auth/password/reset/confirm',
+		},
+	},
 	SETTINGS: '/settings',
-};
+	USERS: {
+		ROOT: '/users',
+		PROFILE: '/users/profile',
+		CHANGE_PASSWORD: '/users/password/change',
+	},
+	PRODUCTS: {
+		ROOT: '/products',
+		DETAILS: (id: string) => `/products/${id}`,
+		CATEGORY: (category: Category) => `/products/${slugify(category)}`,
+		STORE: (storeId: string) => `/stores/${storeId}/products`,
+	},
+	STORES: {
+		ROOT: '/stores',
+		DETAILS: (id: string) => `/stores/${id}`,
+		UPDATE: (id: string) => `/stores/${id}`,
+	},
+	SESSIONS: {
+		ROOT: '/sessions',
+	},
+} as const;
 
 export const APP_ROUTES = {
 	HOME: '/',
-	LOGIN: '/login',
-	REGISTER: '/register',
-	COMPLETE_PROFILE: '/onboarding/complete-profile',
-
-	PASS_RESET: '/password/reset',
-	PASS_CHANGE: '/password/change',
-
+	CONTACT: '/contact',
+	PRIVACY_POLICY: '/privacy-policy',
+	TERMS_CONDITIONS: '/terms-conditions',
+	NEW: '/new',
+	NOT_FOUND: '*',
+	AUTH: {
+		LOGIN: '/login',
+		REGISTER: '/register',
+		COMPLETE_PROFILE: '/onboarding/complete-profile',
+		PASSWORD: {
+			RESET: '/password/reset',
+			CHANGE: '/password/change',
+		},
+	},
 	CATEGORY: (cat: Category | ':cat') =>
 		`/category/${cat === ':cat' ? cat : slugify(cat)}`,
-	COLLECTIONS: (q?: string) => (q ? `/collections/${q}` : '/collections'),
-	STORES: '/stores',
-	STORE_DETAILS: (id: string) => `/stores/${id}`,
-	CREATE_STORE: '/stores/create',
+	COLLECTIONS: (query?: string) =>
+		query ? `/collections/${query}` : '/collections',
 	CART: '/cart',
+	STORES: {
+		ROOT: '/stores',
+		DETAILS: (id: string | ':id') => `/stores/${id}`,
+		CREATE: '/stores/create',
+	},
 	PROFILE: '/profile',
 	SETTINGS: '/settings',
-
-	CONTACT: '/contact',
-	PRIVACY_POLICY: '/privacy_policy',
-	TERMS_CONDITIONS: '/terms_conditions',
-	NEW: '/new',
-
-	NOT_FOUND: '*',
-};
+} as const;
 
 const API_BASE_URL = env.VITE_API_BASE_URL;
 export const apiUrl = (endpoint: string) => `${API_BASE_URL}${endpoint}`;

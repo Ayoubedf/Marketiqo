@@ -1,9 +1,9 @@
 import { APP_NAME } from '@/core/config/constants';
-import { useAxiosPrivate } from '@/features/auth';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
-import * as storeService from '@/services/storeService';
+import { getStores } from '@/services/storeService';
 import { ApiError, isApiError, Store } from '@/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useAxiosPrivate } from '@/features/auth';
 
 export const useStoresList = () => {
 	const [stores, setStores] = useState<Store[] | null>(null);
@@ -11,9 +11,8 @@ export const useStoresList = () => {
 	const [error, setError] = useState<ApiError | null>(null);
 
 	const axiosPrivate = useAxiosPrivate();
-	const getStores = useCallback(
-		(controller?: AbortController) =>
-			storeService.getStores(axiosPrivate, controller),
+	const handleGetStores = useCallback(
+		(controller?: AbortController) => getStores(axiosPrivate, controller),
 		[axiosPrivate]
 	);
 
@@ -22,7 +21,7 @@ export const useStoresList = () => {
 		setLoading(true);
 
 		const fetchStores = async () => {
-			const response = await getStores(controller);
+			const response = await handleGetStores(controller);
 			if (isApiError(response)) {
 				if (response.code === 'REQUEST_CANCELLED') return;
 				setError(response);
@@ -34,7 +33,7 @@ export const useStoresList = () => {
 		return () => {
 			controller.abort();
 		};
-	}, [getStores]);
+	}, [handleGetStores]);
 
 	const title = useMemo(() => `Stores | ${APP_NAME}`, []);
 	useDocumentTitle(title);

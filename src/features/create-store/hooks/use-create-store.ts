@@ -2,7 +2,7 @@ import { APP_NAME, APP_ROUTES } from '@/core/config/constants';
 import { useAuthState, useAxiosPrivate } from '@/features/auth';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { useImageUpload } from '@/shared/hooks/use-image-upload';
-import * as storeService from '@/services/storeService';
+import { createStore } from '@/services/storeService';
 import { notify } from '@/lib/notify';
 import {
 	Category,
@@ -37,8 +37,8 @@ export default function useCreateStore() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const axiosPrivate = useAxiosPrivate();
-	const createStore = useCallback(
-		(data: FormData) => storeService.createStore(axiosPrivate, data),
+	const handleCreateStore = useCallback(
+		(data: FormData) => createStore(axiosPrivate, data),
 		[axiosPrivate]
 	);
 	const navigate = useNavigate();
@@ -101,7 +101,7 @@ export default function useCreateStore() {
 			}
 		}
 		categories.forEach((category) => {
-			formData.append('categories', category);
+			formData.append('categories[]', category);
 		});
 
 		if (!validate()) {
@@ -113,13 +113,13 @@ export default function useCreateStore() {
 		}
 
 		setIsSubmitting(true);
-		const response = await createStore(formData);
+		const response = await handleCreateStore(formData);
 		setIsSubmitting(false);
 
 		if (!isApiError(response)) {
 			dispatch({ type: 'UPDATE_USER', payload: { role: 'merchant' } });
 			resetForm();
-			navigate(APP_ROUTES.STORES);
+			navigate(APP_ROUTES.STORES.ROOT);
 		}
 	};
 

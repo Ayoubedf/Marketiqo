@@ -1,5 +1,5 @@
 import { useAxiosPrivate } from '@/features/auth';
-import * as sessionService from '@/services/sessionService';
+import { getSessions } from '@/services/sessionService';
 import { ApiError, isApiError, ISession } from '@/types';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -9,9 +9,8 @@ export default function useSessions() {
 	const [error, setError] = useState<ApiError | null>(null);
 
 	const axiosPrivate = useAxiosPrivate();
-	const getSessions = useCallback(
-		(controller?: AbortController) =>
-			sessionService.getSessions(axiosPrivate, controller),
+	const handleGetSessions = useCallback(
+		(controller?: AbortController) => getSessions(axiosPrivate, controller),
 		[axiosPrivate]
 	);
 
@@ -20,7 +19,7 @@ export default function useSessions() {
 		setLoading(true);
 
 		const fetchSessions = async () => {
-			const response = await getSessions(controller);
+			const response = await handleGetSessions(controller);
 			if (isApiError(response)) {
 				if (response.code === 'REQUEST_CANCELLED') return;
 				setError(response);
@@ -30,7 +29,7 @@ export default function useSessions() {
 
 		fetchSessions();
 		return () => controller.abort();
-	}, [getSessions]);
+	}, [handleGetSessions]);
 
 	return {
 		error,

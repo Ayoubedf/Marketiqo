@@ -15,13 +15,13 @@ import {
 	VerifyOtpPayload,
 	User,
 	PasswordResetResponse,
-	Token,
+	RefreshResponse,
 } from '@/types';
 
 export async function register(data: RegisterRequestPayload) {
 	return apiRequest<User>(
 		{
-			url: API_ENDPOINTS.REGISTER,
+			url: API_ENDPOINTS.AUTH.REGISTER,
 			method: 'POST',
 			data,
 		},
@@ -36,7 +36,7 @@ export async function register(data: RegisterRequestPayload) {
 export async function completeProfile(data: FormData) {
 	return await apiRequest<User>(
 		{
-			url: API_ENDPOINTS.COMPLETE_PROFILE,
+			url: API_ENDPOINTS.AUTH.COMPLETE_PROFILE,
 			method: 'POST',
 			data,
 		},
@@ -51,7 +51,7 @@ export async function completeProfile(data: FormData) {
 export async function login(data: LoginFormValues) {
 	return apiRequest<AuthResponse>(
 		{
-			url: API_ENDPOINTS.LOGIN,
+			url: API_ENDPOINTS.AUTH.LOGIN,
 			method: 'POST',
 			data,
 		},
@@ -63,15 +63,14 @@ export async function login(data: LoginFormValues) {
 	);
 }
 
-export async function logout(axios: Axios) {
+export async function logout() {
 	return apiRequest<void>(
 		{
-			url: API_ENDPOINTS.LOGOUT,
+			url: API_ENDPOINTS.AUTH.LOGOUT,
 			method: 'DELETE',
 		},
 		undefined,
-		{ title: 'Logout failed' },
-		axios
+		{ title: 'Logout failed' }
 	);
 }
 
@@ -82,8 +81,8 @@ export async function updateProfile(axios: Axios, data: FormData) {
 
 	const response = await apiRequest<User>(
 		{
-			url: API_ENDPOINTS.PROFILE,
-			method: 'PUT',
+			url: API_ENDPOINTS.USERS.PROFILE,
+			method: 'PATCH',
 			data,
 		},
 		{
@@ -104,7 +103,7 @@ export async function updatePassword(
 ) {
 	return apiRequest<void>(
 		{
-			url: API_ENDPOINTS.PASS_CHANGE,
+			url: API_ENDPOINTS.USERS.CHANGE_PASSWORD,
 			method: 'PATCH',
 			data,
 		},
@@ -120,7 +119,7 @@ export async function updatePassword(
 export async function resetPassword(data: ResetPasswordPayload) {
 	return apiRequest<PasswordResetResponse>(
 		{
-			url: API_ENDPOINTS.PASS_RESET_REQUEST,
+			url: API_ENDPOINTS.AUTH.PASSWORD.RESET_REQUEST,
 			method: 'POST',
 			data: { email: data.email },
 		},
@@ -132,7 +131,7 @@ export async function resetPassword(data: ResetPasswordPayload) {
 export async function verifyOTP(data: VerifyOtpPayload) {
 	return apiRequest<VerifyOtpResponse>(
 		{
-			url: API_ENDPOINTS.VERIFY_OTP,
+			url: API_ENDPOINTS.AUTH.VERIFY_OTP,
 			method: 'POST',
 			data,
 		},
@@ -147,7 +146,7 @@ export async function resetConfPassword(
 ) {
 	return apiRequest<void>(
 		{
-			url: API_ENDPOINTS.PASS_RESET_CONFIRM,
+			url: API_ENDPOINTS.AUTH.PASSWORD.RESET_CONFIRM,
 			method: 'PATCH',
 			data,
 			withCredentials: true,
@@ -159,13 +158,9 @@ export async function resetConfPassword(
 }
 
 export async function refresh() {
-	return apiRequest<Token>(
-		{
-			url: API_ENDPOINTS.REFRESH,
-			method: 'GET',
-			withCredentials: true,
-		},
-		undefined,
-		{ title: 'Session refresh failed' }
-	);
+	return apiRequest<RefreshResponse>({
+		url: API_ENDPOINTS.AUTH.REFRESH,
+		method: 'POST',
+		withCredentials: true,
+	});
 }

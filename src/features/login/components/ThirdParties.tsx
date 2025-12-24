@@ -6,7 +6,7 @@ export const ThirdParties = () => {
 		<div className="mt-6 grid grid-cols-2 gap-4">
 			<Button variant="outline" asChild>
 				<a
-					href={apiUrl(API_ENDPOINTS.LOGIN_GOOGLE)}
+					href={apiUrl(API_ENDPOINTS.AUTH.LOGIN_GOOGLE)}
 					className="flex w-full justify-center gap-3 rounded-md bg-white px-3 py-2 text-center text-sm font-semibold text-gray-900 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-800/50"
 				>
 					<svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
@@ -32,7 +32,7 @@ export const ThirdParties = () => {
 			</Button>
 			<Button variant="outline" asChild>
 				<a
-					href={apiUrl(API_ENDPOINTS.LOGIN_GITHUB)}
+					href={apiUrl(API_ENDPOINTS.AUTH.LOGIN_GITHUB)}
 					className="flex w-full justify-center gap-3 rounded-md bg-white px-3 py-2 text-center text-sm font-semibold text-gray-900 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-800/50"
 				>
 					<svg

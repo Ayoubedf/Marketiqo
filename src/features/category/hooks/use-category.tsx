@@ -1,11 +1,10 @@
 import { APP_NAME } from '@/core/config/constants';
-import { useAxiosPrivate } from '@/features/auth';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
-import * as productService from '@/services/productService';
+import { getProductsByCategory } from '@/services/productService';
 import { ApiError, Category, isApiError, isCategory, Product } from '@/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { slugify } from '../utils/format';
+import { useAxiosPrivate } from '@/features/auth';
 import { capitalize } from '@/shared/utils/capitalize';
 
 export function useCategory() {
@@ -14,12 +13,11 @@ export function useCategory() {
 	const [error, setError] = useState<ApiError | null>(null);
 	const axiosPrivate = useAxiosPrivate();
 	const { cat = '' } = useParams<{ cat?: string }>();
-	const category: Category | null =
-		cat && isCategory(cat) ? slugify(cat) : null;
+	const category: Category | null = cat && isCategory(cat) ? cat : null;
 
-	const getProductsByCategory = useCallback(
+	const handleGetProductsByCategory = useCallback(
 		(category: Category, controller?: AbortController) =>
-			productService.getProductsByCategory(axiosPrivate, category, controller),
+			getProductsByCategory(axiosPrivate, category, controller),
 		[axiosPrivate]
 	);
 
@@ -31,11 +29,11 @@ export function useCategory() {
 			controller?: AbortController
 		) => {
 			setLoading(true);
-			const response = await getProductsByCategory(category, controller);
+			const response = await handleGetProductsByCategory(category, controller);
 			if (isApiError(response)) {
 				if (response.code === 'REQUEST_CANCELLED') return;
 				setError(response);
-			} else setProducts(response);
+			} else setProducts(response.items);
 			setLoading(false);
 		};
 
@@ -43,7 +41,7 @@ export function useCategory() {
 		fetchProducts(category, controller);
 
 		return () => controller.abort();
-	}, [category, getProductsByCategory]);
+	}, [category, handleGetProductsByCategory]);
 
 	const title = useMemo(
 		() => `${(category && capitalize(category)) || 'Category'} | ${APP_NAME}`,

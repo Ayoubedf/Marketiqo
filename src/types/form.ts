@@ -33,6 +33,7 @@ export interface AddProductFormValues {
 	name: string;
 	description: string;
 	price: number;
+	category: string;
 }
 
 export interface ManageStoreFormValues {
@@ -58,6 +59,7 @@ export interface StoreValidationErrors {
 export interface ProductValidationErrors {
 	name?: string;
 	price?: string;
+	category?: Category;
 }
 
 export interface StructuredDate {

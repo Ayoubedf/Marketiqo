@@ -7,25 +7,35 @@ import {
 } from '@/types';
 import { validateSchema } from '@/shared/utils/validation';
 import { addProductSchema } from '@/shared/utils/validation/schemas';
-import { AxiosError } from 'axios';
 import { useCallback, useRef, useState } from 'react';
+import { useAxiosPrivate } from '@/features/auth';
+import { addStoreProducts } from '@/services/productService';
 
-export const useAddProduct = () => {
+export const useAddProduct = (id: string) => {
 	const preview = useImageUpload();
 	const nameRef = useRef<HTMLInputElement>(null);
 	const descRef = useRef<HTMLTextAreaElement>(null);
 	const priceRef = useRef<HTMLInputElement>(null);
+	const [category, setCategory] = useState<string>('');
 	const [validationErrors, setValidationErrors] =
 		useState<ProductValidationErrors>({});
-	const [isSubmitting] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const axiosPrivate = useAxiosPrivate();
+	const handleAddProduct = useCallback(
+		(data: FormData) => addStoreProducts(axiosPrivate, id, data),
+		[axiosPrivate, id]
+	);
+	const MAX_FILE_SIZE_MB = 5;
 
 	const getFormValues = useCallback(
 		(): AddProductFormValues => ({
 			name: nameRef.current?.value.trim() || '',
 			price: parseFloat(priceRef.current?.value ?? '0'),
 			description: descRef.current?.value.trim() || '',
+			category,
 		}),
-		[]
+		[category]
 	);
 
 	const validate = useCallback((): boolean => {
@@ -54,6 +64,7 @@ export const useAddProduct = () => {
 		if (nameRef.current) nameRef.current.value = '';
 		if (descRef.current) descRef.current.value = '';
 		if (priceRef.current) priceRef.current.value = '';
+		setCategory('');
 		preview.handleRemove();
 		setValidationErrors({});
 	};
@@ -66,8 +77,18 @@ export const useAddProduct = () => {
 		const formData = new FormData();
 		formData.append('name', values.name);
 		formData.append('description', values.description);
-		if (file) formData.append('preview', file);
+		if (file) {
+			formData.append('preview', file);
+			if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+				notify.error("Can't upload file", {
+					description: `File too large. Max size is ${MAX_FILE_SIZE_MB}MB.`,
+				});
+				preview.handleRemove();
+				return;
+			}
+		}
 		formData.append('price', values.price.toString());
+		formData.append('category', values.category);
 
 		if (!validate()) {
 			notify.error('Validation Error', {
@@ -77,25 +98,14 @@ export const useAddProduct = () => {
 			return;
 		}
 
-		try {
-			notify.success('Product Added', {
-				description: 'Your product has been added successfully.',
-			});
-			resetForm();
-		} catch (error) {
-			console.error('Error: ', error);
-
-			notify.error('failed to Add Product', {
-				description:
-					error instanceof AxiosError
-						? error.response?.data.message
-						: 'Something went wrong while adding the product.',
-			});
-		}
+		setIsSubmitting(true);
+		await handleAddProduct(formData);
+		resetForm();
+		setIsSubmitting(false);
 	};
 
 	return {
-		refs: { nameRef, descRef, priceRef },
+		refs: { nameRef, descRef, priceRef, category, setCategory },
 		preview,
 		validateField,
 		validationErrors,

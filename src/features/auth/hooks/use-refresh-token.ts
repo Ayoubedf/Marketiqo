@@ -1,20 +1,18 @@
-import axios from '@/services/api';
-import { API_ENDPOINTS } from '@/core/config/constants';
 import { tokenManager, useAuthState } from '@/features/auth';
-import { Refresh } from '@/types';
+import { refresh } from '@/services/authService';
+import { isApiError, Refresh } from '@/types';
 
 export const useRefreshToken = () => {
 	const { dispatch } = useAuthState();
 
-	const refresh: Refresh = async () => {
-		const response = await axios.get(API_ENDPOINTS.REFRESH, {
-			withCredentials: true,
-		});
-
-		dispatch({ type: 'SET_USER', payload: response.data.user });
-		tokenManager.setAccessToken(response.data.token);
-
-		return response.data.token;
+	const handleRefresh: Refresh = async () => {
+		const response = await refresh();
+		if (!isApiError(response)) {
+			dispatch({ type: 'SET_USER', payload: response.user });
+			tokenManager.setAccessToken(response.access_token);
+			return response.access_token;
+		}
+		throw response;
 	};
-	return refresh;
+	return handleRefresh;
 };

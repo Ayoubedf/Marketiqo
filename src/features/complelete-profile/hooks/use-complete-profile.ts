@@ -3,7 +3,7 @@ import { useAuthActions } from '@/features/auth';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { useImageUpload } from '@/shared/hooks/use-image-upload';
 import { notify } from '@/lib/notify';
-import { isApiError, ProfileFormValues } from '@/types';
+import { isApiError, ProfileFormValues, TempTokenPayload } from '@/types';
 import { validateSchema } from '@/shared/utils/validation';
 import { profileSchema } from '@/shared/utils/validation/schemas';
 import { jwtDecode } from 'jwt-decode';
@@ -16,29 +16,19 @@ interface ValidationErrors {
 	birthDate?: string;
 }
 
-interface TempUser {
-	oauth_id: string;
-	oauth_provider: string;
-	avatar: string;
-	email: string;
-	isVerified: boolean;
-	name: string;
-	birthDate: Date;
-}
-
 const useProfile = () => {
 	const token = new URLSearchParams(useLocation().search).get('token') || '';
-
-	let tempUser: TempUser | null = null;
+	let tempUser = null;
 
 	try {
-		const decoded = jwtDecode<{ tempUser: TempUser; exp: number; iat: number }>(
-			token
-		);
+		const decoded = jwtDecode<TempTokenPayload>(token);
 
 		if (decoded.exp * 1000 < Date.now()) {
-			notify.error('There was an error', { description: 'temp token expired' });
-		} else tempUser = decoded.tempUser;
+			notify.error('Session expired', {
+				description:
+					'your temporary token is no longer valid. To continue, please restart the onboarding process.',
+			});
+		} else tempUser = decoded.sub;
 	} catch (err) {
 		console.error('Invalid reset token:', err);
 	}
@@ -138,7 +128,7 @@ const useProfile = () => {
 		setIsSubmitting(false);
 
 		if (!isApiError(response)) {
-			navigate(APP_ROUTES.LOGIN, {
+			navigate(APP_ROUTES.AUTH.LOGIN, {
 				replace: true,
 			});
 		}

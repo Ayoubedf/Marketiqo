@@ -2,25 +2,13 @@ import { createContext } from 'react';
 import { AuthActions, AuthContextState } from '@/types';
 import { useContext } from 'react';
 
-export const AuthStateContext = createContext<AuthContextState>({
-	state: { user: null },
-	loading: false,
-	isAuthenticated: false,
-	isOAuthUser: false,
-	dispatch: () => {},
-});
+export const AuthStateContext = createContext<AuthContextState | undefined>(
+	undefined
+);
 
-export const AuthActionsContext = createContext<AuthActions>({
-	register: async () => {},
-	completeProfile: async () => {},
-	login: async () => {},
-	updateProfile: async () => {},
-	updatePassword: async () => {},
-	resetPassword: async () => {},
-	resetConfPassword: async () => {},
-	verifyOTP: async () => {},
-	logout: async () => {},
-});
+export const AuthActionsContext = createContext<AuthActions | undefined>(
+	undefined
+);
 
 export const useAuthState = () => {
 	const ctx = useContext(AuthStateContext);

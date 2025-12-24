@@ -77,7 +77,7 @@ const NavItems = ({ isOpen }: NavItemsProps) => {
 						>
 							Categories
 							<ChevronDownIcon
-								className="-me-1 opacity-60 transition-transform duration-700 [transition-timing-function:cubic-bezier(0.68,-0.6,0.32,1.6)] group-aria-expanded:rotate-[180deg]"
+								className="-me-1 opacity-60 transition-transform duration-700 [transition-timing-function:cubic-bezier(0.68,-0.6,0.32,1.6)] group-aria-expanded:rotate-180"
 								size={16}
 								aria-hidden="true"
 							/>
@@ -99,7 +99,7 @@ const NavItems = ({ isOpen }: NavItemsProps) => {
 			</li>
 			<li>
 				<NavLink
-					to={APP_ROUTES.STORES}
+					to={APP_ROUTES.STORES.ROOT}
 					className={({ isActive }) =>
 						`nav-item ${isActive ? 'text-primary' : 'text-gray-700'}`
 					}
